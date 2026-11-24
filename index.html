@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bilim Ovası Robotik | Oyun ve Kodlama Merkezi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #faf8ff;
+      --bg-card: rgba(255, 255, 255, 0.92);
+      --text-dark: #1e1338;
+      --text-muted: #64597a;
+      --accent-dark: #2c1254;
+      --accent-purple: #7c3aed;
+      --accent-pink: #ec4899;
+      --accent-orange: #f97316;
+      --accent-green: #10b981;
+      --border-soft: rgba(124, 58, 237, 0.15);
+      --shadow-soft: 0 16px 40px rgba(44, 18, 84, 0.08);
+      --shadow-hover: 0 22px 52px rgba(124, 58, 237, 0.17);
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    button, .game-preview, .tag, .sub-pill, .code-block { user-select: none; }
+    :focus-visible { outline: 3px solid var(--accent-purple); outline-offset: 2px; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-dark);
+      overflow-x: hidden;
+      line-height: 1.55;
+      background-image:
+        radial-gradient(circle at 12% 8%, rgba(236, 72, 153, 0.12) 0%, transparent 36%),
+        radial-gradient(circle at 88% 12%, rgba(124, 58, 237, 0.14) 0%, transparent 40%),
+        linear-gradient(to right, rgba(124, 58, 237, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(124, 58, 237, 0.04) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 42px 42px, 42px 42px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1, h2, .serif-title { font-family: 'Fraunces', serif; letter-spacing: -0.02em; }
+
+    /* COMPACT STICKY NAVBAR */
+    .navbar {
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(16px);
+      background: rgba(250, 248, 255, 0.86);
+      border-bottom: 1px solid var(--border-soft);
+      padding: 12px 5%;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 14px; flex-wrap: wrap;
+    }
+
+    .brand { display: flex; align-items: center; gap: 11px; text-decoration: none; color: var(--text-dark); font-weight: 800; font-size: 1.2rem; }
+    .brand-icon {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+      display: flex; align-items: center; justify-content: center; color: white; font-size: 1.3rem;
+      box-shadow: 0 6px 18px rgba(124, 58, 237, 0.3);
+    }
+
+    .btn-primary {
+      background: var(--accent-dark); color: #fff; border: none; padding: 10px 20px;
+      border-radius: 999px; font-weight: 700; font-size: 0.9rem; cursor: pointer;
+      transition: all 0.2s ease; box-shadow: 0 8px 20px rgba(44, 18, 84, 0.18);
+      display: inline-flex; align-items: center; gap: 7px; font-family: inherit;
+    }
+    .btn-primary:hover { transform: translateY(-2px); background: var(--accent-purple); }
+
+    .btn-outline {
+      background: #fff; color: var(--text-dark); border: 1.5px solid var(--border-soft);
+      padding: 9px 18px; border-radius: 999px; font-weight: 700; font-size: 0.88rem;
+      cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 7px; font-family: inherit;
+    }
+    .btn-outline:hover { border-color: var(--accent-purple); color: var(--accent-purple); }
+
+    /* MAIN DIRECT GAME HUB */
+    .hub-container { max-width: 1220px; width: 100%; margin: 26px auto 52px; padding: 0 4%; flex: 1; }
+    .hub-topbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+    .hub-heading h1 { font-size: clamp(1.65rem, 3vw, 2.3rem); line-height: 1.15; }
+    .hub-heading h1 span { background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 8px; }
+    .filter-btn { background: #fff; border: 1.5px solid var(--border-soft); padding: 8px 16px; border-radius: 999px; font-weight: 700; font-size: 0.85rem; color: var(--text-muted); cursor: pointer; transition: all 0.18s; font-family: inherit; }
+    .filter-btn.active, .filter-btn:hover { background: var(--accent-dark); color: #fff; border-color: var(--accent-dark); }
+
+    .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 20px; }
+    .game-card { background: var(--bg-card); border: 1.5px solid var(--border-soft); border-radius: var(--radius-xl); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.22s ease; box-shadow: var(--shadow-soft); }
+    .game-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); border-color: var(--accent-purple); }
+    .game-preview { height: 126px; border-radius: var(--radius-lg); margin-bottom: 14px; display: flex; align-items: center; justify-content: center; font-size: 2.8rem; cursor: pointer; }
+    .game-tags { display: flex; gap: 7px; margin-bottom: 8px; flex-wrap: wrap; }
+    .tag { font-size: 0.72rem; font-weight: 800; padding: 3px 10px; border-radius: 999px; text-transform: uppercase; }
+    .tag-mouse { background: #ede9fe; color: #6d28d9; }
+    .tag-keyboard { background: #fce7f3; color: #be185d; }
+    .tag-logic { background: #fef3c7; color: #b45309; }
+    .tag-special { background: #ffedd5; color: #c2410c; }
+    .tag-new { background: #dcfce7; color: #15803d; }
+
+    .game-card h3 { font-size: 1.22rem; margin-bottom: 6px; }
+    .game-card p { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 14px; }
+    .quick-sub-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+    .sub-pill { font-size: 0.75rem; font-weight: 700; padding: 4px 9px; border-radius: 8px; background: #f5f3ff; border: 1px solid var(--border-soft); color: var(--accent-dark); cursor: pointer; transition: all 0.15s; }
+    .sub-pill:hover { background: var(--accent-purple); color: #fff; }
+    .game-meta { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-soft); padding-top: 12px; }
+    .age-pill { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); }
+
+    /* MODAL STAGE */
+    .game-modal { position: fixed; inset: 0; background: rgba(22, 11, 43, 0.84); backdrop-filter: blur(10px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 10px; }
+    .game-modal.active { display: flex; }
+    .modal-box { background: #fff; width: 100%; max-width: 1140px; min-height: 650px; max-height: 96vh; border-radius: var(--radius-xl); box-shadow: 0 35px 90px rgba(0, 0, 0, 0.48); display: flex; flex-direction: column; overflow: hidden; border: 2px solid rgba(124, 58, 237, 0.3); }
+    .modal-header { background: #f5f0ff; padding: 12px 22px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-soft); flex-wrap: wrap; gap: 10px; }
+    .modal-title { font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 9px; }
+    .close-btn { background: #fff; border: 1px solid var(--border-soft); padding: 7px 16px; border-radius: 999px; font-weight: 700; cursor: pointer; color: var(--text-dark); font-family: inherit; }
+    .close-btn:hover { background: #fee2e2; color: #dc2626; }
+    .modal-stage { flex: 1; padding: 16px 20px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; background: radial-gradient(circle at center, #fdfbff 0%, #f3eeff 100%); }
+
+    /* COMMON GAME ELEMENTS */
+    .progress-outer { width: 100%; max-width: 520px; height: 24px; background: #e9d5ff; border-radius: 999px; overflow: hidden; margin-bottom: 14px; border: 2px solid #c084fc; }
+    .progress-inner { height: 100%; width: 0%; background: linear-gradient(90deg, #8b5cf6, #ec4899); transition: width 0.3s ease; }
+    .play-canvas { width: 100%; height: 400px; background: linear-gradient(180deg, #e0f2fe 0%, #f0fdf4 100%); border-radius: var(--radius-lg); border: 2px solid var(--border-soft); position: relative; overflow: hidden; cursor: crosshair; }
+    .balloon { position: absolute; width: 66px; height: 82px; border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; font-weight: 800; cursor: pointer; box-shadow: inset -8px -8px 16px rgba(0,0,0,0.15); }
+    .balloon::after { content: ''; position: absolute; bottom: -16px; width: 2px; height: 16px; background: rgba(0,0,0,0.3); }
+
+    /* ================================================================
+       SALİHLİ SOKAKLARI — YOL ÜZERİNDE CADDE İSİMLERİ & 9 GERÇEK KONUM
+       ================================================================ */
+    .city-coding-wrap {
+      width: 100%; display: grid; grid-template-columns: 1.55fr 1fr; gap: 18px; align-items: start;
+    }
+    @media (max-width: 940px) { .city-coding-wrap { grid-template-columns: 1fr; } }
+
+    .salihli-map-board {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 6 / 5;
+      min-height: 465px;
+      background: #d9f0cb;
+      border-radius: 22px;
+      border: 4px solid #1e293b;
+      overflow: hidden;
+      box-shadow: 0 18px 42px rgba(15, 23, 42, 0.22);
+    }
+
+    /* 9 Named Salihli Landmark Parcels */
+    .landmark-parcel {
+      position: absolute;
+      width: 18%;
+      height: 17.5%;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 2px solid rgba(100, 116, 139, 0.28);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 4px;
+      z-index: 2;
+      pointer-events: none;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+    }
+    .landmark-parcel .lm-icon { font-size: 1.45rem; line-height: 1.1; margin-bottom: 2px; }
+    .landmark-parcel .lm-name { font-size: 0.67rem; font-weight: 800; color: #1e293b; line-height: 1.15; }
+
+    .lm-park { background: linear-gradient(135deg, #bbf7d0, #86efac); border-color: #22c55e; }
+    .lm-river { background: linear-gradient(135deg, #bae6fd, #7dd3fc); border-color: #0284c7; }
+    .lm-hospital { background: linear-gradient(135deg, #fee2e2, #fecaca); border-color: #ef4444; }
+    .lm-mall { background: linear-gradient(135deg, #fce7f3, #fbcfe8); border-color: #ec4899; }
+    .lm-station { background: linear-gradient(135deg, #e2e8f0, #cbd5e1); border-color: #475569; }
+    .lm-kofte { background: linear-gradient(135deg, #ffedd5, #fed7aa); border-color: #f97316; }
+    .lm-school { background: linear-gradient(135deg, #ede9fe, #ddd6fe); border-color: #7c3aed; }
+    .lm-square { background: linear-gradient(135deg, #fef9c3, #fde047); border-color: #eab308; }
+
+    /* Asphalt Roads */
+    .road-h {
+      position: absolute; left: 0; right: 0; height: 36px; background: #334155;
+      transform: translateY(-50%);
+      box-shadow: inset 0 2px 0 #94a3b8, inset 0 -2px 0 #94a3b8;
+      z-index: 1;
+    }
+    .road-h::before {
+      content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 2px;
+      background: repeating-linear-gradient(90deg, rgba(248,250,252,0.42) 0 11px, transparent 11px 22px);
+      transform: translateY(-50%);
+    }
+
+    .road-v {
+      position: absolute; top: 0; bottom: 0; width: 36px; background: #334155;
+      transform: translateX(-50%);
+      box-shadow: inset 2px 0 0 #94a3b8, inset -2px 0 0 #94a3b8;
+      z-index: 1;
+    }
+    .road-v::before {
+      content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 2px;
+      background: repeating-linear-gradient(180deg, rgba(248,250,252,0.42) 0 11px, transparent 11px 22px);
+      transform: translateX(-50%);
+    }
+
+    /* Street Names Painted Directly ON the Roads */
+    .road-name-h {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      color: #fef08a;
+      background: rgba(30, 41, 59, 0.88);
+      padding: 2px 7px;
+      border-radius: 5px;
+      border: 1px solid rgba(250, 204, 21, 0.35);
+      z-index: 4;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .road-name-v {
+      position: absolute;
+      transform: translate(-50%, -50%) rotate(-90deg);
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #e0f2fe;
+      background: rgba(30, 41, 59, 0.88);
+      padding: 2px 6px;
+      border-radius: 5px;
+      border: 1px solid rgba(125, 211, 252, 0.4);
+      z-index: 4;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .intersection-node {
+      position: absolute; width: 38px; height: 38px; transform: translate(-50%, -50%);
+      border-radius: 50%; z-index: 8; display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+    }
+
+    .car-sprite {
+      position: absolute; width: 42px; height: 42px; z-index: 15;
+      transform: translate(-50%, -50%);
+      transition: left 0.46s cubic-bezier(0.4, 0, 0.2, 1), top 0.46s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .car-rotator {
+      width: 38px; height: 38px; transition: transform 0.34s ease;
+      filter: drop-shadow(0 4px 5px rgba(0,0,0,0.45));
+    }
+
+    /* SCRATCH-STYLE BLOCK CODING WORKSPACE */
+    .block-panel {
+      background: #fff; border: 1.5px solid var(--border-soft); border-radius: 20px;
+      padding: 15px; display: flex; flex-direction: column; gap: 10px;
+      box-shadow: var(--shadow-soft);
+    }
+    .block-palette { display: flex; flex-wrap: wrap; gap: 7px; }
+    .code-block {
+      padding: 8px 12px; border-radius: 10px; color: #fff; font-weight: 800; font-size: 0.82rem;
+      cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: none; font-family: inherit;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.22); transition: transform 0.12s;
+    }
+    .code-block:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,0.22); }
+    .blk-move { background: #3b82f6; }
+    .blk-turn { background: #8b5cf6; }
+    .blk-loop { background: #f59e0b; }
+    .blk-loop3 { background: #ea580c; }
+    .blk-sound { background: #ec4899; }
+    .blk-hat { background: #16a34a; border-radius: 16px 16px 8px 8px; cursor: default; box-shadow: none; width: fit-content; }
+
+    .workspace-chain {
+      background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 15px;
+      padding: 12px; min-height: 205px; max-height: 265px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 4px; align-items: flex-start;
+    }
+    .snapped-block { width: 100%; justify-content: space-between; border-radius: 8px; padding: 7px 11px; font-size: 0.82rem; }
+    .snapped-block.running { outline: 3px solid #facc15; filter: brightness(1.12); transform: scale(1.02); }
+
+    /* ================================================================
+       SALİHLİ ODUN KÖFTECİSİ
+       ================================================================ */
+    .kofte-restaurant { width: 100%; border-radius: 22px; overflow: hidden; border: 3px solid #78350f; background: #fef3c7; box-shadow: 0 20px 50px rgba(120, 53, 15, 0.25); }
+    .shop-awning { height: 30px; background: repeating-linear-gradient(90deg, #dc2626 0 32px, #fffbeb 32px 64px); border-bottom: 4px solid #991b1b; }
+    .shop-banner { background: linear-gradient(90deg, #451a03, #78350f, #451a03); color: #fef3c7; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .customer-counter { background: linear-gradient(180deg, #fde68a 0%, #fcd34d 100%); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 5px solid #92400e; flex-wrap: wrap; }
+    .customer-card { display: flex; align-items: center; gap: 14px; }
+    .customer-avatar { width: 66px; height: 66px; border-radius: 50%; background: #fff; border: 3px solid #92400e; display: flex; align-items: center; justify-content: center; font-size: 2.4rem; }
+    .speech-bubble { background: #fff; border: 2.5px solid #92400e; border-radius: 18px; padding: 10px 16px; position: relative; }
+    .speech-bubble::before { content: ''; position: absolute; left: -12px; top: 50%; transform: translateY(-50%); border-width: 8px 12px 8px 0; border-style: solid; border-color: transparent #92400e transparent transparent; }
+    .kitchen-workspace { display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; padding: 18px; background: linear-gradient(180deg, #d97706 0%, #b45309 100%); }
+    @media (max-width: 780px) { .kitchen-workspace { grid-template-columns: 1fr; } }
+
+    .wood-oven { background: linear-gradient(180deg, #44403c, #1c1917); border: 5px solid #7c2d12; border-radius: 18px; padding: 14px; box-shadow: inset 0 0 35px rgba(234, 88, 12, 0.75); }
+    .ember-glow { height: 16px; border-radius: 8px; margin-bottom: 10px; background: linear-gradient(90deg, #ef4444, #f97316, #facc15, #f97316, #ef4444); animation: emberPulse 1.4s infinite alternate; }
+    @keyframes emberPulse { from { opacity: 0.75; filter: blur(1px); } to { opacity: 1; filter: blur(0px); } }
+    .grill-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; background: repeating-linear-gradient(90deg, rgba(255,255,255,0.08) 0 4px, transparent 4px 18px); padding: 8px; border-radius: 12px; border: 2px solid #57534e; }
+    .kofte-slot { height: 76px; border-radius: 12px; border: 1.5px dashed rgba(255,255,255,0.22); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s; }
+    .kofte-slot:hover { transform: scale(1.04); }
+    .kofte-patty { width: 64px; height: 28px; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 800; box-shadow: 0 4px 8px rgba(0,0,0,0.45); }
+    .patty-raw { background: linear-gradient(180deg, #fca5a5, #ef4444); color: #7f1d1d; }
+    .patty-cooked { background: repeating-linear-gradient(45deg, #78350f, #78350f 8px, #451a03 8px, #451a03 12px); color: #fef3c7; box-shadow: 0 0 14px #facc15; }
+    .patty-burnt { background: #171717; color: #a3a3a3; }
+    .cook-meter { width: 58px; height: 6px; background: #292524; border-radius: 99px; margin-top: 6px; overflow: hidden; }
+    .cook-fill { height: 100%; transition: width 0.3s linear; }
+    .serving-tray { background: #fffbeb; border: 4px solid #92400e; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; }
+    .pide-plate { background: radial-gradient(circle, #fef9c3 50%, #fde68a 100%); border: 4px solid #cbd5e1; border-radius: 22px; min-height: 118px; padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .pide-bread { background: linear-gradient(135deg, #f59e0b, #d97706); border: 2px solid #92400e; border-radius: 14px; padding: 8px 14px; min-width: 180px; min-height: 54px; display: flex; flex-wrap: wrap; gap: 5px; align-items: center; justify-content: center; }
+    .mini-kofte { width: 28px; height: 14px; border-radius: 999px; background: repeating-linear-gradient(45deg, #78350f, #78350f 5px, #451a03 5px, #451a03 8px); box-shadow: 0 2px 4px rgba(0,0,0,0.35); }
+    .ingredient-btn { background: #fff; border: 2px solid #d97706; border-radius: 14px; padding: 9px 10px; font-weight: 800; font-size: 0.82rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; color: #451a03; }
+    .ingredient-btn:hover { background: #fef3c7; transform: translateY(-2px); }
+
+    /* TOP HANGİ BARDAKTA */
+    .cup-table { position: relative; width: 100%; max-width: 680px; height: 320px; background: radial-gradient(ellipse at 50% 35%, #15803d 0%, #14532d 75%, #052e16 100%); border-radius: 26px; border: 8px solid #78350f; box-shadow: inset 0 0 45px rgba(0,0,0,0.45), 0 18px 36px rgba(0,0,0,0.25); overflow: hidden; margin: 12px 0; }
+    .cup-wrapper { position: absolute; top: 108px; width: 118px; height: 142px; transform: translateX(-50%); cursor: pointer; transition: left 0.38s cubic-bezier(0.45, 0, 0.55, 1), top 0.28s ease; z-index: 10; }
+    .cup-svg-body { width: 100%; height: 100%; transition: transform 0.36s cubic-bezier(0.34, 1.4, 0.64, 1); filter: drop-shadow(0 14px 12px rgba(0,0,0,0.45)); }
+    .cup-wrapper.lifted .cup-svg-body { transform: translate(34px, -44px) rotate(20deg); }
+    .cup-ball { position: absolute; top: 202px; width: 44px; height: 44px; transform: translateX(-50%); z-index: 4; transition: left 0.38s cubic-bezier(0.45, 0, 0.55, 1); filter: drop-shadow(0 6px 6px rgba(0,0,0,0.5)); }
+    .cup-ball.pop { animation: ballPop 0.35s ease-out; }
+    @keyframes ballPop { 0% { transform: translateX(-50%) scale(0.4); } 60% { transform: translateX(-50%) scale(1.18); } 100% { transform: translateX(-50%) scale(1); } }
+
+    /* ROBOT GRID & WATER SORT */
+    .robot-grid { display: grid; grid-template-columns: repeat(5, 60px); grid-template-rows: repeat(5, 60px); gap: 6px; background: #ede9fe; padding: 12px; border-radius: 18px; }
+    .robot-cell { background: #fff; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; border: 1.5px solid rgba(124,58,237,0.14); }
+    .tubes-wrap { position: relative; display: flex; gap: 22px; justify-content: center; flex-wrap: wrap; margin: 52px 0 20px; }
+    .tube.pouring { position: relative; z-index: 20; transition: transform 0.34s ease; box-shadow: 0 14px 26px rgba(76,29,149,0.3); }
+    .pour-stream { position: absolute; width: 6px; border-radius: 3px; transform-origin: top; animation: streamIn 0.18s ease-out forwards; z-index: 30; pointer-events: none; }
+    .water-layer.pour-in { animation: layerIn 0.55s ease-out forwards; }
+    .water-layer.pour-out { animation: layerOut 0.55s ease-in forwards; }
+    @keyframes streamIn { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+    @keyframes layerIn { from { height: 0; } to { height: 25%; } }
+    @keyframes layerOut { from { height: 25%; } to { height: 0; } }
+    .tube { width: 58px; height: 170px; border: 3px solid #4c1d95; border-top: none; border-radius: 0 0 26px 26px; display: flex; flex-direction: column-reverse; overflow: hidden; cursor: pointer; background: rgba(255,255,255,0.75); transition: transform 0.2s; }
+    .tube.selected { transform: translateY(-14px); box-shadow: 0 12px 24px rgba(124, 58, 237, 0.28); }
+    .water-layer { width: 100%; height: 25%; }
+
+    footer { text-align: center; padding: 24px 5%; border-top: 1px solid var(--border-soft); color: var(--text-muted); font-size: 0.86rem; background: rgba(255,255,255,0.65); }
+
+    /* PROFIL / GIRIS / KARNE */
+    .user-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-weight:700; font-size:0.85rem; }
+    .user-chip { background:#fff; border:1.5px solid var(--border-soft); border-radius:999px; padding:7px 14px; }
+    .login-overlay { position:fixed; inset:0; background:rgba(22,11,43,0.88); backdrop-filter:blur(8px); z-index:2000; display:none; align-items:center; justify-content:center; padding:14px; }
+    .login-overlay.active { display:flex; }
+    .login-box { background:#fff; border-radius:var(--radius-xl); padding:24px; width:100%; max-width:440px; max-height:92vh; overflow-y:auto; box-shadow:var(--shadow-hover); }
+    .login-box h2 { margin-bottom:6px; }
+    .login-box input { width:100%; padding:12px 14px; margin:6px 0; border:2px solid var(--border-soft); border-radius:12px; font-size:1rem; font-family:inherit; font-weight:700; }
+    .login-box input:focus { border-color:var(--accent-purple); outline:none; }
+    .login-err { color:#dc2626; font-weight:700; font-size:0.85rem; min-height:20px; }
+    .login-list { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+    .report-table { width:100%; border-collapse:collapse; font-size:0.9rem; margin:10px 0; }
+    .report-table td, .report-table th { padding:7px 8px; border-bottom:1px solid var(--border-soft); text-align:left; }
+    .report-text { width:100%; height:120px; font-family:monospace; font-size:0.8rem; border:1.5px solid var(--border-soft); border-radius:10px; padding:8px; }
+  </style>
+</head>
+<body>
+
+  <!-- COMPACT NAVBAR -->
+  <header class="navbar">
+    <a href="#" class="brand">
+      <div class="brand-icon">🤖</div>
+      <span>Bilim Ovası Robotik</span>
+    </a>
+    <div class="user-bar" id="userBar"></div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn-outline" onclick="openGame('balloon')">🎈 Tıklama Oyunu</button>
+      <button class="btn-outline" onclick="openGame('kofte')">🍢 Odun Köftecisi</button>
+      <button class="btn-primary" onclick="openGame('salihlicar')">🚗 Salihli Kod-Sürüş</button>
+    </div>
+  </header>
+
+  <!-- DIRECT GAME SELECTION HUB -->
+  <main class="hub-container">
+    <div class="hub-topbar">
+      <div class="hub-heading">
+        <h1>Oyun ve <span>Kodlama Merkezi</span></h1>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterGames('all', this)">✨ Tümü</button>
+        <button class="filter-btn" onclick="filterGames('special', this)">📍 Salihli Özel</button>
+        <button class="filter-btn" onclick="filterGames('logic', this)">🧩 Mantık & Kodlama</button>
+        <button class="filter-btn" onclick="filterGames('mouse', this)">🖱️ Fare</button>
+        <button class="filter-btn" onclick="filterGames('keyboard', this)">⌨️ Klavye</button>
+      </div>
+    </div>
+
+    <div class="games-grid">
+      <!-- 1. SALİHLİ SOKAKLARINDA BLOK KODLAMA (8 GÖREV) -->
+      <div class="game-card" data-category="special logic">
+        <div>
+          <div class="game-preview" style="background: linear-gradient(135deg, #dcfce7, #86efac);" onclick="openGame('salihlicar')">🚗🗺️🏥🚉</div>
+          <div class="game-tags">
+            <span class="tag tag-new">✨ 8 Bölüm • 9 Konum</span>
+            <span class="tag tag-special">📍 Salihli</span>
+          </div>
+          <h3>Salihli Sokaklarında Kod-Sürüş</h3>
+          <p>Çınarlı Parkı, Kent Meydanı, Gümüş Çayı, Luna AVM, Devlet Hastanesi ve Tren İstasyonu'na blok kodlama ile ulaş!</p>
+        </div>
+        <div class="game-meta">
+          <span class="age-pill">👧 6+ Yaş • Blok Kodlama</span>
+          <button class="btn-primary" onclick="openGame('salihlicar')">Oyna ▶</button>
+        </div>
+      </div>
+
+      <!-- 2. SALİHLİ ODUN KÖFTECİSİ -->
+      <div class="game-card" data-category="special mouse logic">
+        <div>
+          <div class="game-preview" style="background: linear-gradient(135deg, #ffedd5, #fdba74);" onclick="openGame('kofte')">🍢🔥🥛</div>
+          <div class="game-tags">
+            <span class="tag tag-special">🍢 Salihli Özel</span>
+            <span class="tag tag-mouse">🖱️ Fare & Zaman</span>
+          </div>
+          <h3>Salihli Odun Köftecisi</h3>
+          <p>Meşe odunu taş ocağında köfteleri pişir, sıcak Salihli pidesine diz, köz biber, domates ve yayık ayranla hızlı servis yap!</p>
+        </div>
+        <div class="game-meta">
+          <span class="age-pill">👧 6+ Yaş • Bahşiş Sistemi</span>
+          <button class="btn-primary" onclick="openGame('kofte')">Oyna ▶</button>
+        </div>
+      </div>
+
+      <!-- 3. BİLGİSAYARLA TANIŞIYORUM -->
+      <div class="game-card" data-category="mouse keyboard">
+        <div>
+          <div class="game-preview" style="background: linear-gradient(135deg, #ede9fe, #ddd6fe);" onclick="openGame('balloon')">🎈🧩🚢🚀</div>
+          <div class="game-tags"><span class="tag tag-mouse">🖱️ Tıklama Oyunu Paketi</span></div>
+          <h3>Bilgisayarla Tanışıyorum</h3>
+          <p>Dolum çubuklu balon patlatma, sürükle-bırak yapboz, fare tekerleği denizaltı ve büyük tuşlar roket eğitimi.</p>
+          <div class="quick-sub-pills">
+            <span class="sub-pill" onclick="openGame('balloon')">🎈 Balon</span>
+            <span class="sub-pill" onclick="openGame('dragpuzzle')">🧩 Yapboz</span>
+            <span class="sub-pill" onclick="openGame('submarine')">🚢 Tekerlek</span>
+            <span class="sub-pill" onclick="openGame('rocketkeys')">🚀 Tuşlar</span>
+          </div>
+        </div>
+        <div class="game-meta">
+          <span class="age-pill">🧒 4+ Yaş • 4 Aşama</span>
+          <button class="btn-primary" onclick="openGame('balloon')">Oyna ▶</button>
+        </div>
+      </div>
+
+      <!-- 4. ROBOTU KODLA -->
+      <div class="game-card" data-category="logic">
+        <div>
+          <div class="game-preview" style="background: linear-gradient(135deg, #dcfce7, #bbf7d0);" onclick="openGame('coderobot')">🤖➡️⬆️🏆</div>
+          <div class="game-tags"><span class="tag tag-logic">🧩 5 Aşamalı Algoritma</span></div>
+          <h3>Robotu Kodla</h3>
+          <p>Yön komutlarını sıraya dizip robotu engellerden geçirerek hedefe ulaştır! Her aşamada farklı bir parkur seni bekliyor.</p>
+        </div>
+        <div class="game-meta">
+          <span class="age-pill">👧 6+ Yaş • 5 Seviye</span>
+          <button class="btn-primary" onclick="openGame('coderobot')">Oyna ▶</button>
+        </div>
+      </div>
+
+      <!-- 5. TOP HANGİ BARDAKTA -->
+      <div class="game-card" data-category="logic mouse">
+        <div>
+          <div class="game-preview" style="background: linear-gradient(135deg, #ffe4e6, #fda4af);" onclick="openGame('cups')">🥤⚽👀</div>
+          <div class="game-tags">
+            <span class="tag tag-logic">🧩 Görsel Dikkat</span>
+            <span class="tag tag-mouse">🖱️ Takip</span>
+          </div>
+          <h3>Top Hangi Bardakta?</h3>
+          <p>Çuha masa üzerinde birbirinin üzerinden kavisle geçen 3D bardakları gözünle takip et, hızlanan turlarda altın topu yakala!</p>
+        </div>
+        <div class="game-meta">
+          <span class="age-pill">🧒 5+ Yaş • Hızlanan Turlar</span>
+          <button class="btn-primary" onclick="openGame('cups')">Oyna ▶</button>
+        </div>
+      </div>
+
+      <!-- 6. NOKTALARI BİRLEŞTİR -->
+      <div class="game-card" data-category="mouse logic">
+        <div>
+          <div class="game-preview" style="background: linear-gradient(135deg, #e0f2fe, #bae6fd);" onclick="openGame('dots')">1️⃣➔2️⃣➔👑</div>
+          <div class="game-tags">
+            <span class="tag tag-mouse">🖱️ Fare Takibi</span>
+            <span class="tag tag-logic">🧩 8 Şekil</span>
+          </div>
+          <h3>Noktaları Birleştir</h3>
+          <p>Yıldız, Roket, Ev, Yelkenli, Çam Ağacı, Kalp, Kral Tacı ve Elmas şekillerini sayıları sırayla birleştirerek ortaya çıkar!</p>
+        </div>
+        <div class="game-meta">
+          <span class="age-pill">🧒 5+ Yaş • 8 Şekil</span>
+          <button class="btn-primary" onclick="openGame('dots')">Oyna ▶</button>
+        </div>
+      </div>
+
+      <!-- 7. HARF YAĞMURU -->
+      <div class="game-card" data-category="keyboard">
+        <div>
+          <div class="game-preview" style="background: linear-gradient(135deg, #fce7f3, #fbcfe8);" onclick="openGame('letterrain')">🌧️🅰️🅱️⌨️</div>
+          <div class="game-tags"><span class="tag tag-keyboard">⌨️ Klavye Refleks</span></div>
+          <h3>Harf Yağmuru</h3>
+          <p>Yukarıdan düşen harfin klavyedeki tuşuna yere değmeden bas! Klavyedeki harflerin yerini hızla öğren.</p>
+        </div>
+        <div class="game-meta">
+          <span class="age-pill">👧 6+ Yaş • Klavye</span>
+          <button class="btn-primary" onclick="openGame('letterrain')">Oyna ▶</button>
+        </div>
+      </div>
+
+      <!-- 8. KLAVYE HIZ TESTİ -->
+      <div class="game-card" data-category="keyboard">
+        <div>
+          <div class="game-preview" style="background: linear-gradient(135deg, #f3e8ff, #e9d5ff);" onclick="openGame('typing')">⌨️⚡⏱️</div>
+          <div class="game-tags"><span class="tag tag-keyboard">⌨️ On Parmak Hız</span></div>
+          <h3>Klavye Hız Testi (DKS)</h3>
+          <p>60 saniyede kaç Türkçe robotik ve Salihli kelimesi yazabilirsin? Dakikadaki kelime sayını (DKS) ölç!</p>
+        </div>
+        <div class="game-meta">
+          <span class="age-pill">👦 7+ Yaş • 60 Saniye</span>
+          <button class="btn-primary" onclick="openGame('typing')">Oyna ▶</button>
+        </div>
+      </div>
+
+      <!-- 9. SU SIRALAMA -->
+      <div class="game-card" data-category="logic mouse">
+        <div>
+          <div class="game-preview" style="background: linear-gradient(135deg, #fef9c3, #fde047);" onclick="openGame('watersort')">🧪🎨🧠</div>
+          <div class="game-tags"><span class="tag tag-logic">🧩 Mantık & Planlama</span></div>
+          <h3>Su Sıralama</h3>
+          <p>Renkli sıvıları deney tüpleri arasında dikkatlice aktar, her tüpte yalnızca tek bir renk kalsın!</p>
+        </div>
+        <div class="game-meta">
+          <span class="age-pill">👧 6+ Yaş • Mantık</span>
+          <button class="btn-primary" onclick="openGame('watersort')">Oyna ▶</button>
+        </div>
+      </div>
+
+      <!-- 10. XOX -->
+      <div class="game-card" data-category="logic mouse">
+        <div>
+          <div class="game-preview" style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe);" onclick="openGame('xox')">❌⭕🏆</div>
+          <div class="game-tags"><span class="tag tag-logic">🧩 Strateji</span></div>
+          <h3>XOX (Tic-Tac-Toe)</h3>
+          <p>Bilim Ovası yapay zekasına karşı stratejik hamleler yaparak 3'lü sırayı ilk sen tamamla!</p>
+        </div>
+        <div class="game-meta">
+          <span class="age-pill">🧒 5+ Yaş • Strateji</span>
+          <button class="btn-primary" onclick="openGame('xox')">Oyna ▶</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    🤖 <strong>Bilim Ovası Robotik</strong> — Salihli / Manisa • Eğitici Bilişim ve Kodlama Platformu
+  </footer>
+
+  <!-- GAME MODAL -->
+  <div class="game-modal" id="gameModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">🎮 Oyun Sahnesi</div>
+        <button class="close-btn" onclick="closeModal()">✕ Kapat</button>
+      </div>
+      <div class="modal-stage" id="modalStage"></div>
+    </div>
+  </div>
+
+  <!-- GIRIS -->
+  <div class="login-overlay" id="loginOverlay" role="dialog" aria-modal="true" aria-label="Giriş">
+    <div class="login-box">
+      <h2>👋 Hoş geldin!</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem;">Sınıfını ve adını yaz. Yıldızların ve puanların bu isimle kaydedilir.</p>
+      <input id="loginCls" placeholder="Sınıfın (ör. 3-A)" maxlength="12" autocomplete="off">
+      <input id="loginName" placeholder="Adın" maxlength="24" autocomplete="off">
+      <div class="login-err" id="loginErr"></div>
+      <button class="btn-primary" id="loginBtn" style="width:100%; justify-content:center;">Giriş ▶</button>
+      <div id="loginListWrap" style="margin-top:14px; display:none;">
+        <div style="font-weight:800; font-size:0.85rem; color:var(--text-muted);">Bu bilgisayarda oynayanlar (tıkla ve devam et):</div>
+        <div class="login-list" id="loginList"></div>
+      </div>
+    </div>
+  </div>
+  <!-- KARNE -->
+  <div class="login-overlay" id="reportOverlay" role="dialog" aria-modal="true" aria-label="Karnem">
+    <div class="login-box" style="max-width:520px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;"><h2>📒 Karnem</h2><button class="close-btn" onclick="closeReport()">✕ Kapat</button></div>
+      <div id="reportBody"></div>
+    </div>
+  </div>
+
+  <script>
+
+    // --- PROFIL DEPOSU (localStorage; hata olursa bellekte çalışır) ---
+    const Store = (() => {
+      const KEY = 'bo_v1';
+      let db = { users: {}, current: null, muted: false };
+      try { const r = localStorage.getItem(KEY); if (r) { const o = JSON.parse(r); if (o && o.users) db = Object.assign(db, o); } } catch (e) {}
+      const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) {} };
+      const norm = t => String(t).trim().replace(/\s+/g, ' ').toLocaleUpperCase('tr-TR');
+      const cur = () => db.users[db.current] || null;
+      return {
+        current: cur,
+        users: () => Object.keys(db.users).map(k => ({ key: k, name: db.users[k].name, cls: db.users[k].cls })),
+        login(name, cls) {
+          if (!String(name).trim() || !String(cls).trim()) return false;
+          const k = norm(cls) + '|' + norm(name);
+          if (!db.users[k]) db.users[k] = { name: String(name).trim(), cls: String(cls).trim().toLocaleUpperCase('tr-TR'), stars: {}, best: {} };
+          db.current = k; save(); return true;
+        },
+        loginKey(k) { if (db.users[k]) { db.current = k; save(); return true; } return false; },
+        logout() { db.current = null; save(); },
+        stars(game, level, n) {
+          const u = cur(); if (!u || !(n > 0)) return false;
+          u.stars[game] = u.stars[game] || {};
+          if (n > (u.stars[game][level] || 0)) { u.stars[game][level] = n; save(); return true; }
+          return false;
+        },
+        getStars(game, level) { const u = cur(); return u && u.stars[game] ? (u.stars[game][level] || 0) : 0; },
+        best(game, score) { const u = cur(); if (!u) return; if (score > (u.best[game] || 0)) { u.best[game] = score; save(); } },
+        getBest(game) { const u = cur(); return u ? (u.best[game] || 0) : 0; },
+        total() { const u = cur(); if (!u) return 0; return Object.values(u.stars).reduce((a, g) => a + Object.values(g).reduce((x, y) => x + y, 0), 0); },
+        isMuted: () => !!db.muted,
+        toggleMute() { db.muted = !db.muted; save(); return db.muted; }
+      };
+    })();
+
+    // --- WEB AUDIO SYNTHESIZER ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playTone(freq = 520, type = 'sine', duration = 0.14) {
+      if (Store.isMuted()) return;
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.14, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+    function playWinSound() { [523, 659, 783, 1046].forEach((f, i) => setTimeout(() => playTone(f, 'triangle', 0.2), i * 105)); }
+    function playHorn() { playTone(370, 'sawtooth', 0.12); setTimeout(() => playTone(466, 'sawtooth', 0.2), 130); }
+
+    function filterGames(cat, btn) {
+      if (btn) { document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+      document.querySelectorAll('.game-card').forEach(card => {
+        card.style.display = (cat === 'all' || card.getAttribute('data-category').includes(cat)) ? 'flex' : 'none';
+      });
+    }
+
+    let activeIntervals = [];
+    let activeTimeouts = [];
+    let activeKeyHandler = null;
+
+    function addSafeTimeout(fn, ms) {
+      const id = setTimeout(fn, ms);
+      activeTimeouts.push(id);
+      return id;
+    }
+
+    function clearGameTimers() {
+      activeIntervals.forEach(id => clearInterval(id)); activeIntervals = [];
+      activeTimeouts.forEach(id => clearTimeout(id)); activeTimeouts = [];
+      if (activeKeyHandler) { window.removeEventListener('keydown', activeKeyHandler); activeKeyHandler = null; }
+    }
+
+    function closeModal() {
+      clearGameTimers();
+      document.getElementById('gameModal').classList.remove('active');
+    }
+
+    function openGame(gameKey) {
+      if (!Store.current()) { showLogin(); return; }
+      clearGameTimers();
+      const modal = document.getElementById('gameModal');
+      const title = document.getElementById('modalTitle');
+      const stage = document.getElementById('modalStage');
+      modal.classList.add('active');
+
+      const map = {
+        salihlicar: initSalihliCarCoding,
+        kofte: initSalihliKofteGame,
+        coderobot: initCodeRobotGame,
+        cups: initCupsGame,
+        dots: initConnectDotsGame,
+        balloon: initBalloonGame,
+        dragpuzzle: initDragPuzzle,
+        submarine: initSubmarineGame,
+        rocketkeys: initRocketKeysGame,
+        letterrain: initLetterRainGame,
+        typing: initTypingSpeedGame,
+        watersort: initWaterSortGame,
+        xox: initXoxGame
+      };
+      if (map[gameKey]) map[gameKey](title, stage);
+    }
+
+    // =========================================================================
+    // 1. SALİHLİ SOKAKLARINDA BLOK KODLAMA (YOL ÜZERİNDE CADDE İSİMLERİ & 9 KONUM)
+    // =========================================================================
+    function initSalihliCarCoding(title, stage) {
+      title.innerHTML = '🚗 Salihli Sokaklarında Blok Kodlama — 8 Bölümlü Şehir Haritası';
+
+      const hStreets = ['Çınarlı Cad.', 'Sevgiyolu Cad.', 'Belediye Cad.', 'Atatürk Cad.'];
+      const vStreets = ['Kurudere Cad.', 'Avar Cad.', 'Gökçepınar Cad.', 'Mithatpaşa Cad.'];
+      const rowY = [11, 37, 63, 89];
+      const colX = [11, 37, 63, 89];
+
+      // 9 Named Salihli Landmarks inside the 3x3 blocks between the 4x4 roads
+      const landmarks = [
+        { left: 15, top: 15.2, icon: '🌲', name: 'Çınarlı Parkı', cls: 'lm-park' },
+        { left: 41, top: 15.2, icon: '🏛️', name: 'Kent Meydanı', cls: 'lm-square' },
+        { left: 67, top: 15.2, icon: '🤖', name: 'Bilim Ovası', cls: 'lm-school' },
+        { left: 15, top: 41.2, icon: '🌊', name: 'Gümüş Çayı', cls: 'lm-river' },
+        { left: 41, top: 41.2, icon: '🏢', name: 'Salihli Belediyesi', cls: '' },
+        { left: 67, top: 41.2, icon: '🛍️', name: 'Luna AVM', cls: 'lm-mall' },
+        { left: 15, top: 67.2, icon: '🏥', name: 'Devlet Hastanesi', cls: 'lm-hospital' },
+        { left: 41, top: 67.2, icon: '🍢', name: 'Odun Köftecisi', cls: 'lm-kofte' },
+        { left: 67, top: 67.2, icon: '🚉', name: 'Tren İstasyonu', cls: 'lm-station' }
+      ];
+
+      const missions = [
+        {
+          id: 1, title: 'Bölüm 1: Çınarlı Parkı\'ndan Kent Meydanı\'na',
+          desc: 'Çınarlı Caddesi boyunca ilerle ve Kent Meydanı (🏛️) köşesine ulaş!',
+          start: { r: 0, c: 0, dir: 1 }, target: { r: 0, c: 2, icon: '🏛️', name: 'Kent Meydanı' },
+          obstacles: []
+        },
+        {
+          id: 2, title: 'Bölüm 2: Luna AVM\'ye Gidiyoruz',
+          desc: 'Çınarlı\'dan Mithatpaşa Caddesi\'ne sağa dön ve Luna AVM (🛍️) girişine var!',
+          start: { r: 0, c: 1, dir: 1 }, target: { r: 1, c: 3, icon: '🛍️', name: 'Luna AVM' },
+          obstacles: []
+        },
+        {
+          id: 3, title: 'Bölüm 3: Gümüş Çayı Kenarı',
+          desc: 'Kurudere Caddesi\'nde yol çalışması (🚧) var! Avar Caddesi\'nden inerek Gümüş Çayı (🌊) köşesine ulaş!',
+          start: { r: 0, c: 0, dir: 2 }, target: { r: 2, c: 1, icon: '🌊', name: 'Gümüş Çayı' },
+          obstacles: ['1-0']
+        },
+        {
+          id: 4, title: 'Bölüm 4: Devlet Hastanesi Acil Rota',
+          desc: 'Kurudere ve Avar\'da çalışma (🚧) var! Gökçepınar ve Atatürk Caddesi\'ni kullanarak Devlet Hastanesi\'ne (🏥) ulaş!',
+          start: { r: 0, c: 2, dir: 2 }, target: { r: 3, c: 0, icon: '🏥', name: 'Devlet Hastanesi' },
+          obstacles: ['1-0', '2-1']
+        },
+        {
+          id: 5, title: 'Bölüm 5: Tren İstasyonu Yolculuğu',
+          desc: 'Atatürk ve Belediye caddelerindeki engelleri (🚧) aşarak Sevgiyolu ve Mithatpaşa üzerinden Tren İstasyonu\'na (🚉) git!',
+          start: { r: 2, c: 0, dir: 1 }, target: { r: 3, c: 3, icon: '🚉', name: 'Tren İstasyonu' },
+          obstacles: ['2-2', '3-1']
+        },
+        {
+          id: 6, title: 'Bölüm 6: Salihli Odun Köftecisi Ziyafeti',
+          desc: 'Bilim Ovası\'ndan yola çık! Mithatpaşa ve Gökçepınar\'daki engelleri (🚧) aşıp Odun Köftecisi\'ne (🍢) var!',
+          start: { r: 0, c: 3, dir: 3 }, target: { r: 3, c: 1, icon: '🍢', name: 'Odun Köftecisi' },
+          obstacles: ['1-3', '2-2']
+        },
+        {
+          id: 7, title: 'Bölüm 7: Döngü ile Tren İstasyonu',
+          desc: 'İpucu: "Tekrarla" bloğunu kullanarak Kurudere ve Atatürk Caddesi üzerinden Tren İstasyonu\'na (🚉) en hızlı rotayı kodla!',
+          start: { r: 0, c: 0, dir: 2 }, target: { r: 3, c: 3, icon: '🚉', name: 'Tren İstasyonu' },
+          obstacles: ['0-2', '1-1', '2-2']
+        },
+        {
+          id: 8, title: 'Bölüm 8: Büyük Salihli Usta Şoförü',
+          desc: 'Devlet Hastanesi\'nden Bilim Ovası\'na (🤖) git! Yol çalışmalarını (🚧) aşarak Gümüş Çayı ve Belediye önünden doğru rotayı kur!',
+          start: { r: 3, c: 0, dir: 0 }, target: { r: 0, c: 3, icon: '🤖', name: 'Bilim Ovası' },
+          obstacles: ['3-2', '1-1', '1-3']
+        }
+      ];
+
+      let currentIdx = 0;
+      let blocks = [];
+      let isRunning = false;
+      let carState = { r: 0, c: 0, dir: 1, deg: 90 };
+
+      const blockDefs = {
+        FWD:   { label: '⬆️ İleri Git (1 Kavşak)', cls: 'blk-move' },
+        FWD2:  { label: '🔁 2 Kez İleri Git', cls: 'blk-loop' },
+        FWD3:  { label: '🔁 3 Kez İleri Git', cls: 'blk-loop3' },
+        RIGHT: { label: '↪️ Sağa Dön', cls: 'blk-turn' },
+        LEFT:  { label: '↩️ Sola Dön', cls: 'blk-turn' },
+        HORN:  { label: '🎺 Korna Çal', cls: 'blk-sound' },
+        REP2:  { label: '🔁 Tekrarla 2 kez {', cls: 'blk-loop' },
+        REP3:  { label: '🔁 Tekrarla 3 kez {', cls: 'blk-loop3' },
+        REP4:  { label: '🔁 Tekrarla 4 kez {', cls: 'blk-loop3' },
+        END:   { label: '} Tekrarı Bitir', cls: 'blk-loop' }
+      };
+      const optBlocks = [2, 4, 5, 6, 9, 6, 7, 7];
+      function expandBlocks(list) {
+        const root = [], stack = [{ n: 1, items: root }];
+        list.forEach((b, idx) => {
+          if (/^REP\d$/.test(b)) { const node = { n: Number(b[3]), items: [] }; stack[stack.length - 1].items.push(node); stack.push(node); }
+          else if (b === 'END') { if (stack.length > 1) stack.pop(); }
+          else stack[stack.length - 1].items.push({ cmd: b, idx });
+        });
+        const out = [];
+        (function flat(items) { items.forEach(it => { if (it.cmd) out.push(it); else for (let k = 0; k < it.n; k++) flat(it.items); }); })(root);
+        return out;
+      }
+
+      const carSVG = `
+        <svg viewBox="0 0 64 64" width="38" height="38">
+          <rect x="14" y="6" width="36" height="52" rx="11" fill="#ef4444" stroke="#7f1d1d" stroke-width="3"/>
+          <rect x="18" y="16" width="28" height="14" rx="4" fill="#bae6fd"/>
+          <rect x="20" y="36" width="24" height="10" rx="3" fill="#93c5fd"/>
+          <rect x="16" y="7" width="8" height="5" rx="2" fill="#fef08a"/>
+          <rect x="40" y="7" width="8" height="5" rx="2" fill="#fef08a"/>
+          <rect x="10" y="14" width="4" height="12" rx="2" fill="#0f172a"/>
+          <rect x="50" y="14" width="4" height="12" rx="2" fill="#0f172a"/>
+          <rect x="10" y="38" width="4" height="12" rx="2" fill="#0f172a"/>
+          <rect x="50" y="38" width="4" height="12" rx="2" fill="#0f172a"/>
+        </svg>
+      `;
+
+      function loadMission(idx) {
+        clearGameTimers();
+        isRunning = false;
+        currentIdx = idx;
+        blocks = [];
+        const m = missions[currentIdx];
+        carState = { r: m.start.r, c: m.start.c, dir: m.start.dir, deg: m.start.dir * 90 };
+        renderSalihliView();
+      }
+
+      function renderSalihliView(statusMsg = '', statusColor = 'var(--accent-dark)') {
+        const m = missions[currentIdx];
+        // Horizontal labels placed cleanly on asphalt mid-segments (50% center)
+        // Vertical labels placed cleanly on asphalt segments (24% or 76% alternating)
+        const vLabelTop = [24, 76, 24, 76];
+        let dep = 0;
+        const depths = blocks.map(b => { if (b === 'END') { dep = Math.max(0, dep - 1); return dep; } const d = dep; if (/^REP\d$/.test(b)) dep++; return d; });
+
+        stage.innerHTML = `
+          <div style="width:100%; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:9px;">
+            <div style="display:flex; gap:5px; flex-wrap:wrap;">
+              ${missions.map((ms, i) => `
+                <button class="filter-btn ${i===currentIdx?'active':''}" style="padding:5px 11px; font-size:0.78rem;" onclick="window._loadSalihliMission(${i})">Bölüm ${ms.id}${Store.getStars('salihli', ms.id) ? ' ' + '⭐'.repeat(Store.getStars('salihli', ms.id)) : ''}</button>
+              `).join('')}
+            </div>
+            <div id="liveStreetBadge" style="background:#1e1b4b; color:#fef08a; padding:5px 13px; border-radius:999px; font-size:0.78rem; font-weight:800;">
+              📍 ${hStreets[carState.r]} & ${vStreets[carState.c]}
+            </div>
+          </div>
+
+          <div style="width:100%; background:#f5f3ff; border:1.5px solid var(--border-soft); border-radius:12px; padding:8px 14px; margin-bottom:12px; font-size:0.86rem;">
+            <strong>${m.title}:</strong> ${m.desc}
+          </div>
+
+          <div class="city-coding-wrap">
+            <!-- SALİHLİ HARİTASI (TÜM CADDE İSİMLERİ YOL ÜZERİNDE + 9 İSİMLİ KONUM) -->
+            <div class="salihli-map-board">
+              <!-- 4 Yatay Cadde -->
+              ${rowY.map(y => `<div class="road-h" style="top:${y}%;"></div>`).join('')}
+              <!-- 4 Dikey Cadde -->
+              ${colX.map(x => `<div class="road-v" style="left:${x}%;"></div>`).join('')}
+
+              <!-- Yatay Cadde İsimleri (Doğrudan Asfalt Üzerinde) -->
+              ${rowY.map((y, i) => `
+                <div class="road-name-h" style="top:${y}%; left:50%;">${hStreets[i]}</div>
+              `).join('')}
+
+              <!-- Dikey Cadde İsimleri (Doğrudan Asfalt Üzerinde) -->
+              ${colX.map((x, i) => `
+                <div class="road-name-v" style="left:${x}%; top:${vLabelTop[i]}%;">${vStreets[i]}</div>
+              `).join('')}
+
+              <!-- 9 Gerçek Salihli Konumu -->
+              ${landmarks.map(lm => `
+                <div class="landmark-parcel ${lm.cls}" style="left:${lm.left}%; top:${lm.top}%;">
+                  <div class="lm-icon">${lm.icon}</div>
+                  <div class="lm-name">${lm.name}</div>
+                </div>
+              `).join('')}
+
+              <!-- Hedef İşareti -->
+              <div class="intersection-node" style="left:${colX[m.target.c]}%; top:${rowY[m.target.r]}%; background:#fef08a; border:3px solid #ca8a04; box-shadow:0 0 18px rgba(250,204,21,0.95);" title="Hedef: ${m.target.name}">
+                ${m.target.icon}
+              </div>
+
+              <!-- Yol Çalışmaları -->
+              ${m.obstacles.map(ob => {
+                const [r, c] = ob.split('-').map(Number);
+                return `<div class="intersection-node" style="left:${colX[c]}%; top:${rowY[r]}%; background:#fee2e2; border:2.5px solid #dc2626;">🚧</div>`;
+              }).join('')}
+
+              <!-- Araba -->
+              <div class="car-sprite" id="salihliCar" style="left:${colX[carState.c]}%; top:${rowY[carState.r]}%;">
+                <div class="car-rotator" id="salihliCarRot" style="transform:rotate(${carState.deg}deg);">${carSVG}</div>
+              </div>
+            </div>
+
+            <!-- BLOK KODLAMA PANELİ -->
+            <div class="block-panel">
+              <div style="font-weight:800; font-size:0.9rem; color:var(--accent-dark);">🧱 Komut Blokları (Eklemek için tıkla):</div>
+              <div class="block-palette">
+                <button class="code-block blk-move" onclick="window._addCarBlock('FWD')">⬆️ İleri Git</button>
+                <button class="code-block blk-loop" onclick="window._addCarBlock('REP2')">🔁 Tekrarla 2 {</button>
+                <button class="code-block blk-loop3" onclick="window._addCarBlock('REP3')">🔁 Tekrarla 3 {</button>
+                <button class="code-block blk-loop3" onclick="window._addCarBlock('REP4')">🔁 Tekrarla 4 {</button>
+                <button class="code-block blk-loop" onclick="window._addCarBlock('END')">} Bitir</button>
+                <button class="code-block blk-turn" onclick="window._addCarBlock('RIGHT')">↪️ Sağa Dön</button>
+                <button class="code-block blk-turn" onclick="window._addCarBlock('LEFT')">↩️ Sola Dön</button>
+                <button class="code-block blk-sound" onclick="window._addCarBlock('HORN')">🎺 Korna</button>
+              </div>
+
+              <div style="font-weight:800; font-size:0.85rem; color:var(--text-muted);">📋 Kod Dizisi (Silmek için bloğa tıkla):</div>
+              <div class="workspace-chain" id="carWorkspace">
+                <div class="code-block blk-hat">🚩 Başladığında</div>
+                ${blocks.length === 0 ? '<div style="font-size:0.8rem; color:#94a3b8; margin-top:6px;">Bloklara tıklayarak Salihli rotanı kodla...</div>' : ''}
+                ${blocks.map((b, i) => `
+                  <button class="code-block snapped-block ${blockDefs[b].cls}" style="margin-left:${depths[i]*18}px;" id="blk-${i}" onclick="window._removeCarBlock(${i})">
+                    <span>${i+1}. ${blockDefs[b].label}</span>
+                    <span style="opacity:0.8;">✕</span>
+                  </button>
+                `).join('')}
+              </div>
+
+              <div style="display:flex; gap:8px;">
+                <button class="btn-primary" style="flex:1; justify-content:center; background:#16a34a;" onclick="window._runCarBlocks()">▶️ Kodu Çalıştır</button>
+                <button class="btn-outline" onclick="window._clearCarBlocks()">🗑️ Temizle</button>
+              </div>
+              <div id="carStatusMsg" style="font-weight:800; font-size:0.88rem; color:${statusColor}; min-height:24px;">${statusMsg}</div>
+            </div>
+          </div>
+        `;
+      }
+
+      window._loadSalihliMission = (i) => loadMission(i);
+      window._addCarBlock = (type) => { if (!isRunning) { blocks.push(type); playTone(540, 'sine', 0.08); renderSalihliView(); } };
+      window._removeCarBlock = (i) => { if (!isRunning) { blocks.splice(i, 1); playTone(340, 'sine', 0.07); renderSalihliView(); } };
+      window._clearCarBlocks = () => {
+        if (isRunning) return;
+        const m = missions[currentIdx];
+        blocks = [];
+        carState = { r: m.start.r, c: m.start.c, dir: m.start.dir, deg: m.start.dir * 90 };
+        renderSalihliView();
+      };
+
+      window._runCarBlocks = () => {
+        if (isRunning || blocks.length === 0) return;
+        isRunning = true;
+        const m = missions[currentIdx];
+        carState = { r: m.start.r, c: m.start.c, dir: m.start.dir, deg: m.start.dir * 90 };
+
+        const carEl = document.getElementById('salihliCar');
+        const rotEl = document.getElementById('salihliCarRot');
+        const badge = document.getElementById('liveStreetBadge');
+        const msgEl = document.getElementById('carStatusMsg');
+
+        carEl.style.left = colX[carState.c] + '%';
+        carEl.style.top = rowY[carState.r] + '%';
+        rotEl.style.transform = `rotate(${carState.deg}deg)`;
+        msgEl.style.color = '#7c3aed';
+        msgEl.innerText = '🚗 Araba Salihli caddelerinde ilerliyor...';
+
+        const steps = expandBlocks(blocks);
+
+        let stepPtr = 0;
+        function execNext() {
+          document.querySelectorAll('.snapped-block').forEach(el => el.classList.remove('running'));
+          if (stepPtr >= steps.length) {
+            isRunning = false;
+            if (carState.r === m.target.r && carState.c === m.target.c) {
+              playWinSound();
+              const used = blocks.filter(b => b !== 'END').length, ob = optBlocks[currentIdx];
+              const st = used <= ob ? 3 : used <= ob + 2 ? 2 : 1;
+              Store.stars('salihli', m.id, st); renderUserBar();
+              msgEl.style.color = '#15803d';
+              msgEl.innerHTML = `🎉 Harika! ${m.target.name} konumuna ulaştın! ${'⭐'.repeat(st)} (${used} blok) ${currentIdx < missions.length - 1 ? `<button class="btn-primary" style="padding:5px 12px; font-size:0.78rem; margin-left:6px;" onclick="window._loadSalihliMission(${currentIdx+1})">Bölüm ${currentIdx+2} ➔</button>` : '🏆 Tüm 8 Bölümü Tamamladın!'}`;
+            } else {
+              playTone(260, 'sawtooth', 0.16);
+              msgEl.style.color = '#b45309';
+              msgEl.innerText = '🤔 Hedefe henüz varamadın! Bloklarını düzenleyip tekrar dene.';
+            }
+            return;
+          }
+
+          const s = steps[stepPtr++];
+          const activeBlk = document.getElementById('blk-' + s.idx);
+          if (activeBlk) activeBlk.classList.add('running');
+
+          if (s.cmd === 'RIGHT') {
+            carState.dir = (carState.dir + 1) % 4; carState.deg += 90;
+            rotEl.style.transform = `rotate(${carState.deg}deg)`; playTone(460, 'triangle', 0.1);
+          } else if (s.cmd === 'LEFT') {
+            carState.dir = (carState.dir + 3) % 4; carState.deg -= 90;
+            rotEl.style.transform = `rotate(${carState.deg}deg)`; playTone(420, 'triangle', 0.1);
+          } else if (s.cmd === 'HORN') {
+            playHorn();
+          } else if (s.cmd === 'FWD') {
+            const nr = carState.r + [-1, 0, 1, 0][carState.dir];
+            const nc = carState.c + [0, 1, 0, -1][carState.dir];
+            if (nr < 0 || nr > 3 || nc < 0 || nc > 3) {
+              isRunning = false; playTone(190, 'sawtooth', 0.24);
+              msgEl.style.color = '#dc2626';
+              msgEl.innerText = '🚫 Harita dışına çıktın! Dönüş yönünü kontrol et.';
+              return;
+            }
+            if (m.obstacles.includes(`${nr}-${nc}`)) {
+              isRunning = false; playTone(180, 'sawtooth', 0.24);
+              msgEl.style.color = '#dc2626';
+              msgEl.innerText = '🚧 Yol çalışması var! Farklı bir caddeden dolaşmayı dene.';
+              return;
+            }
+            carState.r = nr; carState.c = nc;
+            carEl.style.left = colX[carState.c] + '%';
+            carEl.style.top = rowY[carState.r] + '%';
+            badge.innerText = `📍 ${hStreets[carState.r]} & ${vStreets[carState.c]}`;
+            playTone(580, 'sine', 0.1);
+          }
+          addSafeTimeout(execNext, 520);
+        }
+        addSafeTimeout(execNext, 300);
+      };
+
+      loadMission(0);
+    }
+
+    // =========================================================================
+    // 2. SALİHLİ ODUN KÖFTECİSİ
+    // =========================================================================
+    function initSalihliKofteGame(title, stage) {
+      title.innerHTML = '🍢 Salihli Odun Köftecisi — Meşe Közünde Usta Şef';
+      let money = 0, servedCount = 0, patience = 100;
+      let grill = Array(6).fill(null);
+      const COOK_AT = 8, BURN_AT = 20; // saniye
+      let plate = { kofte: 0, biber: false, domates: false, ayran: false };
+      const customerList = [
+        { avatar: '🧔', name: 'Salihli Esnafı Mehmet' },
+        { avatar: '👩', name: 'Öğretmen Zeynep' },
+        { avatar: '👦', name: 'Robotikçi Efe' },
+        { avatar: '👴', name: 'Çiftçi Hasan Amca' },
+        { avatar: '👧', name: 'Öğrenci Elif' }
+      ];
+      let order = null;
+      function createOrder() {
+        const c = customerList[Math.floor(Math.random() * customerList.length)];
+        const counts = [3, 4, 5, 6];
+        order = { ...c, kofte: counts[Math.floor(Math.random() * counts.length)], biber: Math.random() > 0.3, domates: Math.random() > 0.45, ayran: Math.random() > 0.25 };
+        patience = 100;
+      }
+      createOrder();
+
+      stage.innerHTML = `
+        <div class="kofte-restaurant">
+          <div class="shop-awning"></div>
+          <div class="shop-banner">
+            <div style="font-weight:800; font-size:1.1rem;">🔥 MEŞHUR SALİHLİ ODUN KÖFTECİSİ 🔥</div>
+            <div style="display:flex; gap:16px; font-weight:800; font-size:0.95rem;">
+              <span>💰 Kasa: <span id="kMoney" style="color:#fde047;">0</span> ₺</span>
+              <span>😊 Müşteri: <span id="kServed">0</span></span>
+            </div>
+          </div>
+          <div class="customer-counter">
+            <div class="customer-card">
+              <div class="customer-avatar" id="kAvatar">🧔</div>
+              <div class="speech-bubble">
+                <div style="font-size:0.78rem; font-weight:800; color:#92400e;" id="kCustName"></div>
+                <div id="kOrderVisual" style="font-size:0.98rem; font-weight:800; color:#1c1917; margin-top:3px;"></div>
+              </div>
+            </div>
+            <div style="min-width:190px;">
+              <div style="font-size:0.78rem; font-weight:800; color:#78350f; margin-bottom:4px;">⏱️ Müşteri Sabrı (+25₺ Hız Bahşişi!)</div>
+              <div style="width:100%; height:14px; background:#fff; border-radius:99px; border:2px solid #92400e; overflow:hidden;">
+                <div id="kPatienceBar" style="width:100%; height:100%; background:#16a34a; transition:width 0.4s;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="kitchen-workspace">
+            <div class="wood-oven">
+              <div style="display:flex; justify-content:space-between; align-items:center; color:#fef3c7; margin-bottom:8px;">
+                <span style="font-weight:800; font-size:0.9rem;">🔥 Meşe Odunu Izgarası</span>
+                <button class="ingredient-btn" style="padding:5px 12px; background:#fef2f2; border-color:#ef4444;" id="putRawBtn">🥩 Izgaraya Köfte Koy</button>
+              </div>
+              <div class="ember-glow"></div>
+              <div class="grill-slots" id="kGrillSlots"></div>
+              <div style="color:#fed7aa; font-size:0.76rem; margin-top:8px; font-weight:600;">💡 Köfte <strong>PİŞTİ!</strong> yazınca hemen tıklayıp pide tabağına al!</div>
+            </div>
+            <div class="serving-tray">
+              <div class="pide-plate">
+                <div style="font-size:0.78rem; font-weight:800; color:#78350f; margin-bottom:6px;">🍽️ Sıcak Salihli Pidesi Tabağı</div>
+                <div class="pide-bread" id="kPideVisual"></div>
+                <div id="kSidesVisual" style="margin-top:8px; font-size:1.1rem; font-weight:800; min-height:24px;"></div>
+              </div>
+              <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px;">
+                <button class="ingredient-btn" id="btnBiber">🌶️ Köz Biber</button>
+                <button class="ingredient-btn" id="btnDomates">🍅 Köz Domates</button>
+                <button class="ingredient-btn" id="btnAyran">🥛 Yayık Ayran</button>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button class="btn-primary" style="flex:1; justify-content:center; background:#15803d;" id="kServeBtn">🔔 SİPARİŞİ SERVİS ET</button>
+                <button class="btn-outline" style="padding:8px 14px;" id="kTrashBtn">🗑️</button>
+              </div>
+              <div id="kFeedback" style="font-weight:800; font-size:0.86rem; text-align:center; min-height:20px;"></div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      function renderKofteUI() {
+        document.getElementById('kMoney').innerText = money;
+        document.getElementById('kServed').innerText = servedCount;
+        document.getElementById('kAvatar').innerText = order.avatar;
+        document.getElementById('kCustName').innerText = order.name + ' istiyor:';
+        document.getElementById('kOrderVisual').innerHTML = `🍢 <strong>${order.kofte} Odun Köfte</strong>${order.biber ? ' + 🌶️ Biber' : ''}${order.domates ? ' + 🍅 Domates' : ''}${order.ayran ? ' + 🥛 Ayran' : ''}`;
+        const pBar = document.getElementById('kPatienceBar');
+        pBar.style.width = Math.max(0, patience) + '%';
+        pBar.style.background = patience > 55 ? '#16a34a' : patience > 25 ? '#f59e0b' : '#dc2626';
+
+        const gBox = document.getElementById('kGrillSlots');
+        gBox.innerHTML = '';
+        grill.forEach((slot, i) => {
+          const el = document.createElement('div'); el.className = 'kofte-slot';
+          if (!slot) {
+            el.innerHTML = `<span style="color:rgba(255,255,255,0.35); font-size:0.75rem; font-weight:700;">+ Boş</span>`;
+            el.onclick = () => { grill[i] = { age: 0, state: 'raw' }; playTone(380, 'sine', 0.08); renderKofteUI(); };
+          } else {
+            const pct = Math.min(100, (slot.age / BURN_AT) * 100);
+            const pCls = slot.state === 'raw' ? 'patty-raw' : slot.state === 'cooked' ? 'patty-cooked' : 'patty-burnt';
+            const lbl = slot.state === 'raw' ? 'Pişiyor' : slot.state === 'cooked' ? 'PİŞTİ!' : 'YANDI!';
+            const mColor = slot.state === 'raw' ? '#f59e0b' : slot.state === 'cooked' ? '#22c55e' : '#ef4444';
+            el.innerHTML = `${slot.state === 'cooked' ? '<div style="font-size:0.7rem; color:#fef08a; margin-bottom:2px;">💨 Tıkla Al!</div>' : ''}<div class="kofte-patty ${pCls}">${lbl}</div><div class="cook-meter"><div class="cook-fill" style="width:${pct}%; background:${mColor};"></div></div>`;
+            el.onclick = () => {
+              if (slot.state === 'cooked') { plate.kofte++; grill[i] = null; playTone(720, 'triangle', 0.12); renderKofteUI(); }
+              else if (slot.state === 'burnt') { grill[i] = null; playTone(190, 'sawtooth', 0.14); renderKofteUI(); }
+            };
+          }
+          gBox.appendChild(el);
+        });
+
+        const pide = document.getElementById('kPideVisual');
+        pide.innerHTML = plate.kofte === 0 ? `<span style="font-size:0.78rem; color:#fef3c7; font-weight:700;">Pişen köfteler buraya dizilir</span>` : Array(plate.kofte).fill('<div class="mini-kofte"></div>').join('');
+        let sides = [];
+        if (plate.kofte > 0) sides.push(`🍢 ×${plate.kofte}`);
+        if (plate.biber) sides.push('🌶️ Köz Biber');
+        if (plate.domates) sides.push('🍅 Domates');
+        if (plate.ayran) sides.push('🥛 Ayran');
+        document.getElementById('kSidesVisual').innerText = sides.join(' • ');
+      }
+
+      document.getElementById('putRawBtn').onclick = () => { const idx = grill.findIndex(s => s === null); if (idx !== -1) { grill[idx] = { age: 0, state: 'raw' }; playTone(400, 'sine', 0.08); renderKofteUI(); } };
+      document.getElementById('btnBiber').onclick = () => { plate.biber = true; playTone(560, 'sine', 0.08); renderKofteUI(); };
+      document.getElementById('btnDomates').onclick = () => { plate.domates = true; playTone(600, 'sine', 0.08); renderKofteUI(); };
+      document.getElementById('btnAyran').onclick = () => { plate.ayran = true; playTone(640, 'sine', 0.08); renderKofteUI(); };
+      document.getElementById('kTrashBtn').onclick = () => { plate = { kofte: 0, biber: false, domates: false, ayran: false }; renderKofteUI(); };
+      document.getElementById('kServeBtn').onclick = () => {
+        const fb = document.getElementById('kFeedback');
+        if (plate.kofte === order.kofte && plate.biber === order.biber && plate.domates === order.domates && plate.ayran === order.ayran) {
+          const tip = patience > 55 ? 25 : 0;
+          const earn = order.kofte * 45 + (order.biber ? 20 : 0) + (order.domates ? 20 : 0) + (order.ayran ? 35 : 0) + tip;
+          money += earn; servedCount++; playWinSound();
+          Store.best('kofte', money); Store.stars('kofte', 1, money >= 1000 ? 3 : money >= 600 ? 2 : money >= 250 ? 1 : 0); renderUserBar();
+          fb.style.color = '#15803d'; fb.innerText = `🎉 Nefis Salihli Odun Köftesi! +${earn} ₺ ${tip ? '(+25₺ Hız Bahşişi!)' : ''}`;
+          plate = { kofte: 0, biber: false, domates: false, ayran: false }; createOrder(); renderKofteUI();
+        } else { playTone(210, 'sawtooth', 0.18); fb.style.color = '#dc2626'; fb.innerText = '⚠️ Sipariş tam eşleşmiyor! Adetleri ve yan ürünleri kontrol et.'; }
+      };
+
+      activeIntervals.push(setInterval(() => {
+        grill.forEach(s => { if (s) { s.age += 0.5; if (s.age >= COOK_AT && s.age < BURN_AT) s.state = 'cooked'; else if (s.age >= BURN_AT) s.state = 'burnt'; } });
+        patience = Math.max(5, patience - 0.8); renderKofteUI();
+      }, 500));
+      renderKofteUI();
+    }
+
+    // =========================================================================
+    // 3. ROBOTU KODLA (5 AŞAMALI)
+    // =========================================================================
+    function initCodeRobotGame(title, stage) {
+      title.innerHTML = '🤖 Robotu Kodla — 5 Aşamalı Algoritma Görevleri';
+      const levels = [
+        { name: 'Aşama 1: İlk Adım', start: {r:0,c:0}, goal: {r:0,c:4, icon:'⭐'}, obs: [] },
+        { name: 'Aşama 2: Pil Toplama', start: {r:0,c:0}, goal: {r:3,c:3, icon:'🔋'}, obs: ['0-3','1-1','2-2'] },
+        { name: 'Aşama 3: Engel Parkuru', start: {r:4,c:0}, goal: {r:0,c:4, icon:'🏆'}, obs: ['3-0','3-1','1-2','1-3','2-3'] },
+        { name: 'Aşama 4: Labirent Geçidi', start: {r:0,c:2}, goal: {r:4,c:2, icon:'🚀'}, obs: ['1-1','1-2','1-3','3-0','3-1','3-2','3-3'] },
+        { name: 'Aşama 5: Usta Robotikçi', start: {r:4,c:4}, goal: {r:0,c:0, icon:'🥇'}, obs: ['3-4','3-3','3-2','1-0','1-1','1-2','2-4'] }
+      ];
+      let lvlIdx = 0, robotPos = { ...levels[0].start }, commands = [], running = false;
+
+      function loadRobotLevel(idx) { clearGameTimers(); running = false; lvlIdx = idx; robotPos = { ...levels[idx].start }; commands = []; renderRobotBoard(); }
+      function renderRobotBoard(msg = '') {
+        const lv = levels[lvlIdx], icons = { UP: '⬆️', DOWN: '⬇️', LEFT: '⬅️', RIGHT: '➡️' };
+        stage.innerHTML = `
+          <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin-bottom:12px;">
+            ${levels.map((l, i) => `<button class="filter-btn ${i===lvlIdx?'active':''}" style="padding:6px 14px; font-size:0.82rem;" onclick="window._loadRobotLvl(${i})">Aşama ${i+1}</button>`).join('')}
+          </div>
+          <div style="font-weight:800; margin-bottom:12px; color:var(--accent-dark);">${lv.name} — Robotu ${lv.goal.icon} hedefine götür!</div>
+          <div style="display:flex; gap:26px; align-items:center; flex-wrap:wrap; justify-content:center;">
+            <div class="robot-grid" id="rGrid"></div>
+            <div style="max-width:310px; width:100%; display:flex; flex-direction:column; gap:10px;">
+              <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:8px;">
+                <button class="btn-outline" onclick="window._addRobotCmd('UP')">⬆️ Yukarı</button>
+                <button class="btn-outline" onclick="window._addRobotCmd('DOWN')">⬇️ Aşağı</button>
+                <button class="btn-outline" onclick="window._addRobotCmd('LEFT')">⬅️ Sol</button>
+                <button class="btn-outline" onclick="window._addRobotCmd('RIGHT')">➡️ Sağ</button>
+              </div>
+              <div style="background:#fff; border:1.5px solid var(--border-soft); border-radius:14px; padding:12px; min-height:76px;">
+                <div style="font-size:0.78rem; font-weight:700; color:var(--text-muted); margin-bottom:4px;">Komut Dizisi (${commands.length} adım):</div>
+                <div style="font-size:1.25rem; word-break:break-word;">${commands.length ? commands.map(c => icons[c]).join(' ') : 'Yönlere tıklayarak komut ekle'}</div>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button class="btn-primary" style="flex:1; justify-content:center;" id="runRobotBtn">Çalıştır ▶</button>
+                <button class="btn-outline" style="padding:8px 12px;" onclick="window._undoRobotCmd()">⌫</button>
+                <button class="btn-outline" style="padding:8px 12px;" onclick="window._loadRobotLvl(${lvlIdx})">🔄</button>
+              </div>
+              <div style="font-weight:800; color:var(--accent-purple); min-height:26px;">${msg}</div>
+            </div>
+          </div>
+        `;
+        const grid = document.getElementById('rGrid');
+        for (let r = 0; r < 5; r++) for (let c = 0; c < 5; c++) {
+          const cell = document.createElement('div'); cell.className = 'robot-cell';
+          if (robotPos.r === r && robotPos.c === c) { cell.innerText = '🤖'; cell.style.background = '#ede9fe'; }
+          else if (lv.goal.r === r && lv.goal.c === c) { cell.innerText = lv.goal.icon; cell.style.background = '#fef9c3'; }
+          else if (lv.obs.includes(`${r}-${c}`)) { cell.innerText = '🧱'; cell.style.background = '#fee2e2'; }
+          grid.appendChild(cell);
+        }
+        document.getElementById('runRobotBtn').onclick = () => {
+          if (running || commands.length === 0) return;
+          running = true; robotPos = { ...lv.start }; let step = 0;
+          const id = setInterval(() => {
+            if (step >= commands.length) {
+              clearInterval(id); running = false;
+              if (robotPos.r === lv.goal.r && robotPos.c === lv.goal.c) {
+                playWinSound();
+                const ro = [4, 6, 8, 8, 12][lvlIdx], st = commands.length <= ro ? 3 : commands.length <= ro + 2 ? 2 : 1;
+                Store.stars('coderobot', lvlIdx + 1, st); renderUserBar();
+                const nextBtn = lvlIdx < levels.length - 1 ? `<button class="btn-primary" style="margin-top:8px; width:100%; justify-content:center; background:#15803d;" onclick="window._loadRobotLvl(${lvlIdx+1})">Sonraki Aşama ➔</button>` : `<div style="color:#15803d; margin-top:6px;">🏆 Tüm 5 Aşama Tamamlandı!</div>`;
+                renderRobotBoard(`🎉 Harika Algoritma! ${'⭐'.repeat(st)} ${nextBtn}`);
+              } else renderRobotBoard('🤔 Hedefe ulaşamadık, komutlarını düzenle!');
+              return;
+            }
+            const cmd = commands[step++];
+            const nr = robotPos.r + (cmd === 'DOWN' ? 1 : cmd === 'UP' ? -1 : 0);
+            const nc = robotPos.c + (cmd === 'RIGHT' ? 1 : cmd === 'LEFT' ? -1 : 0);
+            if (nr < 0 || nr > 4 || nc < 0 || nc > 4 || lv.obs.includes(`${nr}-${nc}`)) { clearInterval(id); running = false; playTone(200, 'sawtooth', 0.2); renderRobotBoard('💥 Engele çarptı! Tekrar dene.'); return; }
+            robotPos = { r: nr, c: nc }; playTone(540, 'sine', 0.09); renderRobotBoard('🤖 Çalışıyor...');
+          }, 350);
+          activeIntervals.push(id);
+        };
+      }
+      window._loadRobotLvl = i => loadRobotLevel(i);
+      window._addRobotCmd = d => { if (!running) { commands.push(d); playTone(460, 'sine', 0.07); renderRobotBoard(); } };
+      window._undoRobotCmd = () => { if (!running && commands.length) { commands.pop(); playTone(320, 'sine', 0.07); renderRobotBoard(); } };
+      loadRobotLevel(0);
+    }
+
+    // =========================================================================
+    // 4. TOP HANGİ BARDAKTA?
+    // =========================================================================
+    function initCupsGame(title, stage) {
+      title.innerHTML = '🥤 Top Hangi Bardakta? — Çuha Masa & Hızlı Takip';
+      let round = 1, score = 0, canPick = false, isShuffling = false, ballCup = 1, cupSlot = [0, 1, 2];
+      const slotLeft = [20, 50, 80];
+      const cupSVG = `<svg viewBox="0 0 120 140" class="cup-svg-body"><defs><linearGradient id="cupGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#991b1b"/><stop offset="30%" stop-color="#ef4444"/><stop offset="55%" stop-color="#f87171"/><stop offset="100%" stop-color="#7f1d1d"/></linearGradient></defs><ellipse cx="60" cy="126" rx="50" ry="11" fill="#7f1d1d"/><path d="M24,18 L96,18 L108,125 C108,132 12,132 12,125 Z" fill="url(#cupGrad)" stroke="#7f1d1d" stroke-width="2"/><ellipse cx="60" cy="18" rx="36" ry="8" fill="#fca5a5" stroke="#991b1b" stroke-width="2"/><path d="M26,42 Q60,50 94,42" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="4" stroke-linecap="round"/><path d="M20,98 Q60,108 100,98" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="5" stroke-linecap="round"/></svg>`;
+      const ballSVG = `<svg viewBox="0 0 50 50" width="44" height="44"><defs><radialGradient id="ballGrad" cx="35%" cy="30%" r="70%"><stop offset="0%" stop-color="#fef08a"/><stop offset="50%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#b45309"/></radialGradient></defs><circle cx="25" cy="25" r="22" fill="url(#ballGrad)" stroke="#92400e" stroke-width="2"/><circle cx="17" cy="16" r="5" fill="rgba(255,255,255,0.6)"/></svg>`;
+
+      stage.innerHTML = `
+        <div style="display:flex; justify-content:space-between; width:100%; max-width:680px; font-weight:800; font-size:1rem;">
+          <span>🎯 Tur: <span id="cupRound">1</span></span>
+          <span id="cupMsg" style="color:var(--accent-purple);">Başlat butonuna bas, altın topu gözünle takip et!</span>
+          <span>🏆 Puan: <span id="cupScore">0</span></span>
+        </div>
+        <div class="cup-table">
+          <div class="cup-ball" id="cupBallEl" style="left:${slotLeft[cupSlot[ballCup]]}%; opacity:0;">${ballSVG}</div>
+          ${[0, 1, 2].map(id => `<div class="cup-wrapper" id="cupWrap-${id}" style="left:${slotLeft[cupSlot[id]]}%;" onclick="window._pickCup(${id})">${cupSVG}</div>`).join('')}
+        </div>
+        <button class="btn-primary" id="shuffleStartBtn" onclick="window._startCupRound()">🎲 Turu Başlat & Karıştır</button>
+      `;
+
+      function syncPositions() {
+        [0, 1, 2].forEach(id => { const el = document.getElementById('cupWrap-' + id); if (el) el.style.left = slotLeft[cupSlot[id]] + '%'; });
+      }
+      // Top: görünmezken ANINDA doğru bardağın altına konur (kayma yok), yalnızca bardak kalkınca belirir
+      function placeBall() {
+        const b = document.getElementById('cupBallEl'); if (!b) return;
+        b.style.transition = 'none'; b.style.opacity = '0'; b.classList.remove('pop');
+        b.style.left = slotLeft[cupSlot[ballCup]] + '%'; void b.offsetWidth; b.style.transition = '';
+      }
+      function showBall() {
+        const b = document.getElementById('cupBallEl'); if (!b) return;
+        b.style.opacity = '1'; b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
+      }
+
+      window._startCupRound = () => {
+        if (isShuffling) return;
+        isShuffling = true; canPick = false;
+        const msg = document.getElementById('cupMsg'), ballEl = document.getElementById('cupBallEl'), btn = document.getElementById('shuffleStartBtn');
+        btn.style.visibility = 'hidden';
+        [0, 1, 2].forEach(id => document.getElementById('cupWrap-' + id).classList.remove('lifted'));
+        ballCup = Math.floor(Math.random() * 3); syncPositions(); placeBall();
+        msg.innerText = '👀 Altın top burada! Dikkatle bak...';
+        document.getElementById('cupWrap-' + ballCup).classList.add('lifted'); playTone(620, 'triangle', 0.16);
+        addSafeTimeout(showBall, 260);
+
+        addSafeTimeout(() => {
+          ballEl.style.opacity = '0';
+          document.getElementById('cupWrap-' + ballCup).classList.remove('lifted');
+          addSafeTimeout(() => {
+            ballEl.style.opacity = '0'; msg.innerText = '🌀 Bardaklar yer değiştiriyor, gözünü ayırma!';
+            const totalSwaps = Math.min(12, 4 + round * 2), swapDuration = Math.max(270, 520 - round * 40);
+            let done = 0;
+            function doOneSwap() {
+              if (done >= totalSwaps) { isShuffling = false; canPick = true; msg.innerText = '👇 Altın top hangi bardağın altında? Tıkla!'; return; }
+              done++;
+              let a = Math.floor(Math.random() * 3), b = (a + 1 + Math.floor(Math.random() * 2)) % 3;
+              const elA = document.getElementById('cupWrap-' + a), elB = document.getElementById('cupWrap-' + b);
+              const tmp = cupSlot[a]; cupSlot[a] = cupSlot[b]; cupSlot[b] = tmp;
+              elA.style.zIndex = 12; elB.style.zIndex = 8;
+              elA.style.transition = `left ${swapDuration}ms cubic-bezier(0.45,0,0.55,1), top ${swapDuration/2}ms ease`;
+              elB.style.transition = `left ${swapDuration}ms cubic-bezier(0.45,0,0.55,1), top ${swapDuration/2}ms ease`;
+              elA.style.top = '72px'; elB.style.top = '136px';
+              elA.style.left = slotLeft[cupSlot[a]] + '%'; elB.style.left = slotLeft[cupSlot[b]] + '%';
+              playTone(360 + done * 25, 'sine', 0.06);
+              addSafeTimeout(() => { elA.style.top = '108px'; elB.style.top = '108px'; }, swapDuration / 2);
+              addSafeTimeout(doOneSwap, swapDuration + 40);
+            }
+            doOneSwap();
+          }, 360);
+        }, 1700);
+      };
+
+      window._pickCup = pickedId => {
+        if (!canPick || isShuffling) return;
+        canPick = false;
+        const msg = document.getElementById('cupMsg'), ballEl = document.getElementById('cupBallEl'), btn = document.getElementById('shuffleStartBtn');
+        placeBall();
+        document.getElementById('cupWrap-' + pickedId).classList.add('lifted');
+        if (pickedId === ballCup) addSafeTimeout(showBall, 260);
+        if (pickedId === ballCup) {
+          score += 100 * round; round++; playWinSound();
+          document.getElementById('cupScore').innerText = score; document.getElementById('cupRound').innerText = round;
+          msg.innerText = '🎉 MÜKEMMEL! Altın topu buldun!';
+        } else {
+          playTone(210, 'sawtooth', 0.2); msg.innerText = '😮 Kaçırdın! Altın top diğer bardaktaydı.';
+          addSafeTimeout(() => { document.getElementById('cupWrap-' + ballCup).classList.add('lifted'); addSafeTimeout(showBall, 260); }, 400);
+        }
+        btn.innerText = '🎲 Sonraki Turu Başlat'; btn.style.visibility = 'visible';
+      };
+    }
+
+    // =========================================================================
+    // 5. NOKTALARI BİRLEŞTİR (8 FARKLI ŞEKİL)
+    // =========================================================================
+    function initConnectDotsGame(title, stage) {
+      title.innerHTML = '🖱️ Noktaları Birleştir — 8 Gizli Şekli Ortaya Çıkar';
+      const shapes = [
+        { name: 'Salihli Yıldızı ⭐', fill: 'rgba(250, 204, 21, 0.32)', pts: [{x:50,y:10},{x:63,y:38},{x:90,y:40},{x:69,y:59},{x:76,y:86},{x:50,y:72},{x:24,y:86},{x:31,y:59},{x:10,y:40},{x:37,y:38}] },
+        { name: 'Bilim Ovası Roketi 🚀', fill: 'rgba(139, 92, 246, 0.25)', pts: [{x:50,y:10},{x:70,y:34},{x:70,y:72},{x:84,y:86},{x:50,y:78},{x:16,y:86},{x:30,y:72},{x:30,y:34}] },
+        { name: 'Sevimli Ev 🏠', fill: 'rgba(249, 115, 22, 0.25)', pts: [{x:24,y:86},{x:24,y:46},{x:14,y:46},{x:50,y:14},{x:86,y:46},{x:76,y:46},{x:76,y:86}] },
+        { name: 'Yelkenli Gemi ⛵', fill: 'rgba(56, 189, 248, 0.28)', pts: [{x:50,y:12},{x:78,y:60},{x:52,y:60},{x:82,y:68},{x:70,y:86},{x:30,y:86},{x:18,y:68},{x:46,y:60}] },
+        { name: 'Çam Ağacı 🌲', fill: 'rgba(34, 197, 94, 0.28)', pts: [{x:50,y:10},{x:72,y:38},{x:60,y:38},{x:80,y:68},{x:58,y:68},{x:58,y:88},{x:42,y:88},{x:42,y:68},{x:20,y:68},{x:40,y:38},{x:28,y:38}] },
+        { name: 'Kalp ❤️', fill: 'rgba(236, 72, 153, 0.28)', pts: [{x:50,y:85},{x:18,y:52},{x:18,y:30},{x:34,y:18},{x:50,y:34},{x:66,y:18},{x:82,y:30},{x:82,y:52}] },
+        { name: 'Kral Tacı 👑', fill: 'rgba(234, 179, 8, 0.30)', pts: [{x:18,y:78},{x:14,y:30},{x:34,y:52},{x:50,y:20},{x:66,y:52},{x:86,y:30},{x:82,y:78}] },
+        { name: 'Elmas Mücevher 💎', fill: 'rgba(99, 102, 241, 0.28)', pts: [{x:32,y:22},{x:50,y:16},{x:68,y:22},{x:86,y:44},{x:50,y:86},{x:14,y:44}] }
+      ];
+      let level = 0;
+      function renderDotLevel(idx) {
+        level = idx; const shape = shapes[level]; let nextIdx = 0;
+        stage.innerHTML = `
+          <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin-bottom:10px;">
+            ${shapes.map((s, i) => `<button class="filter-btn ${i===level?'active':''}" style="padding:5px 11px; font-size:0.78rem;" onclick="window._loadDotShape(${i})">${i+1}. ${s.name.split(' ').pop()}</button>`).join('')}
+          </div>
+          <p style="font-weight:700; margin-bottom:10px;">🖱️ Sayılara <strong>1'den başlayarak</strong> sırayla tıkla! (Şekil ${level+1} / ${shapes.length})</p>
+          <div id="dotBoard" style="width:100%; max-width:560px; height:365px; background:#fff; border-radius:22px; border:2px solid var(--border-soft); position:relative; overflow:hidden;">
+            <svg id="dotSvg" viewBox="0 0 100 100" preserveAspectRatio="none" style="width:100%; height:100%; position:absolute; inset:0;"></svg>
+          </div>
+          <div id="dotStatus" style="margin-top:12px; font-weight:800; color:var(--accent-purple); min-height:36px;"></div>
+        `;
+        const board = document.getElementById('dotBoard'), svg = document.getElementById('dotSvg');
+        shape.pts.forEach((p, i) => {
+          const btn = document.createElement('div');
+          btn.style.cssText = `position:absolute; left:calc(${p.x}% - 19px); top:calc(${p.y}% - 19px); width:38px; height:38px; border-radius:50%; background:${i===0?'#7c3aed':'#ede9fe'}; color:${i===0?'#fff':'#4c1d95'}; font-weight:800; display:flex; align-items:center; justify-content:center; cursor:pointer; border:2px solid #7c3aed; z-index:5;`;
+          btn.innerText = i + 1; btn.id = 'dot-' + i;
+          btn.onclick = () => {
+            if (i === nextIdx) {
+              playTone(480 + i * 42, 'triangle', 0.13); btn.style.background = '#10b981'; btn.style.color = '#fff';
+              if (i > 0) { const prev = shape.pts[i - 1]; svg.innerHTML += `<line x1="${prev.x}" y1="${prev.y}" x2="${p.x}" y2="${p.y}" stroke="#7c3aed" stroke-width="1.3" stroke-linecap="round"/>`; }
+              nextIdx++;
+              if (nextIdx < shape.pts.length) { const nb = document.getElementById('dot-' + nextIdx); nb.style.background = '#7c3aed'; nb.style.color = '#fff'; }
+              else {
+                svg.innerHTML = `<polygon points="${shape.pts.map(pt => `${pt.x},${pt.y}`).join(' ')}" fill="${shape.fill}" stroke="#7c3aed" stroke-width="1.5" stroke-linejoin="round"/>`;
+                playWinSound();
+                document.getElementById('dotStatus').innerHTML = `🎉 Harika! <strong>${shape.name}</strong> ortaya çıktı! ${level < shapes.length - 1 ? `<button class="btn-primary" style="margin-left:10px; padding:7px 16px;" onclick="window._loadDotShape(${level+1})">Sonraki Şekil ➔</button>` : '🏆 Tüm 8 Şekil Tamamlandı!'}`;
+              }
+            } else playTone(220, 'sawtooth', 0.12);
+          };
+          board.appendChild(btn);
+        });
+      }
+      window._loadDotShape = i => renderDotLevel(i);
+      renderDotLevel(0);
+    }
+
+    // =========================================================================
+    // 6. BİLGİSAYARLA TANIŞIYORUM (4 AŞAMA)
+    // =========================================================================
+    function renderLiteracyTabs(activeTab) {
+      return `
+        <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; justify-content:center;">
+          <button class="filter-btn ${activeTab==='balloon'?'active':''}" onclick="openGame('balloon')">🎈 1. Sol Tık Balon</button>
+          <button class="filter-btn ${activeTab==='dragpuzzle'?'active':''}" onclick="openGame('dragpuzzle')">🧩 2. Sürükle-Bırak</button>
+          <button class="filter-btn ${activeTab==='submarine'?'active':''}" onclick="openGame('submarine')">🚢 3. Tekerlek (Scroll)</button>
+          <button class="filter-btn ${activeTab==='rocketkeys'?'active':''}" onclick="openGame('rocketkeys')">🚀 4. Büyük Tuşlar</button>
+        </div>
+      `;
+    }
+
+    function initBalloonGame(title, stage) {
+      title.innerHTML = '🎈 Bilgisayarla Tanışıyorum — Sol Tık Balon Oyunu';
+      let progress = 0; const goal = 10;
+      stage.innerHTML = `${renderLiteracyTabs('balloon')}<div style="font-weight:700; margin-bottom:8px;">🖱️ Farenin SOL TUŞU ile balonlara tıkla ve çubuğu doldur! (<span id="bCount">0</span> / ${goal})</div><div class="progress-outer"><div class="progress-inner" id="bBar"></div></div><div class="play-canvas" id="balloonCanvas"></div>`;
+      const canvas = document.getElementById('balloonCanvas'), colors = ['#ef4444','#8b5cf6','#ec4899','#10b981','#f59e0b','#3b82f6'];
+      function spawnBalloon() {
+        if (progress >= goal) return;
+        const b = document.createElement('div'); b.className = 'balloon'; b.style.background = colors[Math.floor(Math.random()*colors.length)];
+        b.style.left = Math.floor(Math.random()*82+5) + '%'; b.style.bottom = '-90px'; b.innerHTML = '🖱️'; canvas.appendChild(b);
+        let pos = -90;
+        const moveId = setInterval(() => { pos += 1.6; b.style.bottom = pos + 'px'; if (pos > 430) { clearInterval(moveId); b.remove(); } }, 24);
+        activeIntervals.push(moveId);
+        b.onmousedown = () => {
+          clearInterval(moveId); playTone(620 + progress * 40, 'triangle', 0.14); b.innerHTML = '💥'; setTimeout(() => b.remove(), 110);
+          progress++; document.getElementById('bCount').innerText = progress; document.getElementById('bBar').style.width = (progress/goal*100)+'%';
+          if (progress >= goal) {
+            clearGameTimers(); playWinSound();
+            canvas.innerHTML = `<div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;"><div style="font-size:4rem;">🎉🏆🎈</div><h2 style="margin:8px 0;">Harika İş Çıkardın!</h2><div style="display:flex; gap:10px; margin-top:10px;"><button class="btn-outline" onclick="openGame('balloon')">🔄 Tekrar</button><button class="btn-primary" onclick="openGame('dragpuzzle')">Sonraki Aşama ➔</button></div></div>`;
+          }
+        };
+      }
+      spawnBalloon(); activeIntervals.push(setInterval(spawnBalloon, 1050));
+    }
+
+    function initDragPuzzle(title, stage) {
+      title.innerHTML = '🧩 Bilgisayarla Tanışıyorum — Sürükle ve Bırak';
+      const items = [{id:'p1', icon:'🤖', name:'Robot Başlığı'}, {id:'p2', icon:'🔋', name:'Enerji Pili'}, {id:'p3', icon:'⚙️', name:'Dişli Çark'}]; let matched = 0;
+      stage.innerHTML = `${renderLiteracyTabs('dragpuzzle')}<p style="font-weight:700; margin-bottom:16px;">🖱️ Soldaki parçaları basılı tutup sağdaki eşleşen kutulara sürükle!</p><div style="display:flex; gap:44px; flex-wrap:wrap; justify-content:center;"><div style="display:flex; flex-direction:column; gap:12px;">${items.map(it=>`<div draggable="true" id="${it.id}" style="background:#fff; border:2px solid var(--accent-purple); padding:15px 24px; border-radius:16px; font-size:1.25rem; font-weight:800; cursor:grab;">${it.icon} ${it.name}</div>`).join('')}</div><div style="display:flex; flex-direction:column; gap:12px;">${items.map(it=>`<div class="drop-slot" data-target="${it.id}" style="background:#f3e8ff; border:2.5px dashed #9333ea; width:220px; height:64px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-weight:700; color:#6b21a8;">${it.icon} Yuvası</div>`).join('')}</div></div><div id="dragWin" style="margin-top:20px;"></div>`;
+      items.forEach(it => { document.getElementById(it.id).ondragstart = e => e.dataTransfer.setData('text/plain', it.id); });
+      document.querySelectorAll('.drop-slot').forEach(slot => {
+        slot.ondragover = e => e.preventDefault();
+        slot.ondrop = e => {
+          e.preventDefault(); const did = e.dataTransfer.getData('text/plain');
+          if (did === slot.dataset.target) {
+            const el = document.getElementById(did); slot.innerHTML = `✅ ${el.innerText}`; slot.style.background = '#dcfce7'; slot.style.borderColor = '#16a34a'; el.style.visibility = 'hidden';
+            playTone(740, 'triangle', 0.16); matched++;
+            if (matched === 3) { playWinSound(); document.getElementById('dragWin').innerHTML = `<button class="btn-primary" onclick="openGame('submarine')">🎉 3. Aşama: Fare Tekerleği ➔</button>`; }
+          } else playTone(220, 'sawtooth', 0.14);
+        };
+      });
+    }
+
+    function initSubmarineGame(title, stage) {
+      title.innerHTML = '🚢 Bilgisayarla Tanışıyorum — Fare Tekerleği (Scroll)';
+      let depth = 130, stars = 0, starY = 70;
+      stage.innerHTML = `${renderLiteracyTabs('submarine')}<p style="font-weight:700; margin-bottom:10px;">⚙️ Fare tekerleğini çevirerek denizaltıyı yıldızlara götür! (<span id="subStars">0</span>/5)</p><div id="seaArea" style="width:100%; max-width:640px; height:330px; background:linear-gradient(180deg,#38bdf8,#1e3a8a); border-radius:22px; position:relative; overflow:hidden; border:3px solid #0284c7;"><div id="subEl" style="position:absolute; left:80px; top:130px; font-size:3rem; transition:top 0.12s;">🚢</div><div id="starEl" style="position:absolute; right:110px; top:70px; font-size:2.6rem;">⭐</div></div><div style="margin-top:10px; display:flex; gap:10px;"><button class="btn-outline" id="upBtn">⬆️ Yukarı</button><button class="btn-outline" id="downBtn">⬇️ Aşağı</button></div>`;
+      const sea = document.getElementById('seaArea'), subEl = document.getElementById('subEl'), starEl = document.getElementById('starEl');
+      function updateSub(d) {
+        depth = Math.max(15, Math.min(255, depth + d)); subEl.style.top = depth + 'px';
+        if (Math.abs(depth - starY) < 36) {
+          stars++; playTone(880, 'triangle', 0.16); document.getElementById('subStars').innerText = stars;
+          starY = Math.floor(Math.random()*220+20); starEl.style.top = starY + 'px';
+          if (stars >= 5) { playWinSound(); sea.innerHTML = `<div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff;"><h2>🎉 Tekerlek Görevi Tamam!</h2><button class="btn-primary" style="margin-top:12px;" onclick="openGame('rocketkeys')">4. Aşama: Büyük Tuşlar ➔</button></div>`; }
+        }
+      }
+      sea.onwheel = e => { e.preventDefault(); updateSub(e.deltaY > 0 ? 22 : -22); };
+      document.getElementById('upBtn').onclick = () => updateSub(-28); document.getElementById('downBtn').onclick = () => updateSub(28);
+    }
+
+    function initRocketKeysGame(title, stage) {
+      title.innerHTML = '🚀 Bilgisayarla Tanışıyorum — Boşluk ve Harf Tuşları';
+      const letters = ['A','B','K','R','S','T']; let currentTarget = 'BOŞLUK', score = 0;
+      stage.innerHTML = `${renderLiteracyTabs('rocketkeys')}<p style="font-weight:700; margin-bottom:12px;">⌨️ Klavyeden ekranda yazan tuşa bas ve roketi fırlat! (<span id="rkScore">0</span>/6)</p><div style="background:#0f172a; color:#fff; width:100%; max-width:580px; height:290px; border-radius:24px; display:flex; flex-direction:column; align-items:center; justify-content:center;"><div id="rocketIcon" style="font-size:4rem; transition:transform 0.3s;">🚀</div><div id="targetKeyBox" style="margin-top:14px; background:#7c3aed; padding:12px 30px; border-radius:16px; font-size:1.9rem; font-weight:800;">BOŞLUK (SPACE)</div></div>`;
+      activeKeyHandler = e => {
+        const key = e.code === 'Space' ? 'BOŞLUK' : e.key.toUpperCase();
+        if (key === currentTarget) {
+          e.preventDefault(); score++; playTone(700 + score * 50, 'triangle', 0.18); document.getElementById('rkScore').innerText = score;
+          document.getElementById('rocketIcon').style.transform = `translateY(-${score * 12}px)`;
+          if (score >= 6) { playWinSound(); document.getElementById('targetKeyBox').innerText = '🏆 TÜM AŞAMALAR TAMAM!'; clearGameTimers(); }
+          else { currentTarget = letters[Math.floor(Math.random()*letters.length)]; document.getElementById('targetKeyBox').innerText = currentTarget + ' TUŞU'; }
+        }
+      };
+      window.addEventListener('keydown', activeKeyHandler);
+    }
+
+    // =========================================================================
+    // 7. HARF YAĞMURU, KLAVYE HIZ TESTİ, SU SIRALAMA, XOX
+    // =========================================================================
+    function initLetterRainGame(title, stage) {
+      title.innerHTML = '🌧️ Harf Yağmuru — Klavye Refleks';
+      let score = 0, lives = 5, falling = []; const alphabet = 'ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ';
+      stage.innerHTML = `<div style="display:flex; justify-content:space-between; width:100%; max-width:640px; margin-bottom:10px; font-weight:800;"><span>🏆 Puan: <span id="lrScore">0</span></span><span>❤️ Can: <span id="lrLives">5</span></span></div><div class="play-canvas" id="rainCanvas" style="max-width:640px; background:linear-gradient(180deg,#1e1b4b,#312e81);"></div>`;
+      const canvas = document.getElementById('rainCanvas');
+      activeIntervals.push(setInterval(() => {
+        if (lives <= 0) return;
+        const char = alphabet[Math.floor(Math.random()*alphabet.length)], el = document.createElement('div');
+        el.style.cssText = `position:absolute; top:-45px; left:${Math.floor(Math.random()*84+6)}%; width:46px; height:46px; border-radius:12px; background:#fff; color:#1e1b4b; font-weight:800; font-size:1.35rem; display:flex; align-items:center; justify-content:center;`;
+        el.innerText = char; canvas.appendChild(el); falling.push({ char, el, y: -45 });
+      }, 1250));
+      activeIntervals.push(setInterval(() => {
+        if (lives <= 0) return;
+        for (let i = falling.length - 1; i >= 0; i--) {
+          falling[i].y += 2.1 + Math.min(2.2, score * 0.04); falling[i].el.style.top = falling[i].y + 'px';
+          if (falling[i].y > 365) {
+            falling[i].el.remove(); falling.splice(i, 1); lives--; document.getElementById('lrLives').innerText = lives; playTone(210, 'sawtooth', 0.14);
+            if (lives <= 0) { clearGameTimers(); const st = score >= 40 ? 3 : score >= 25 ? 2 : score >= 10 ? 1 : 0; Store.best('letterrain', score); Store.stars('letterrain', 1, st); renderUserBar(); canvas.innerHTML = `<div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff;"><h2>Oyun Bitti! Skor: ${score} ${'⭐'.repeat(st)}</h2><button class="btn-primary" style="margin-top:12px;" onclick="openGame('letterrain')">Tekrar Oyna</button></div>`; }
+          }
+        }
+      }, 28));
+      activeKeyHandler = e => {
+        const idx = falling.findIndex(f => f.char === e.key.toLocaleUpperCase('tr-TR'));
+        if (idx !== -1) { playTone(680, 'triangle', 0.12); falling[idx].el.remove(); falling.splice(idx, 1); score++; document.getElementById('lrScore').innerText = score; }
+      };
+      window.addEventListener('keydown', activeKeyHandler);
+    }
+
+    function initTypingSpeedGame(title, stage) {
+      title.innerHTML = '⌨️ 60 Saniye Klavye Hız Testi (DKS)';
+      const words = ['robot','kodlama','salihli','bilim','çınarlı','kurudere','sevgiyolu','gökçepınar','hastane','istasyon','gümüşçayı','sensör','motor','algoritma','klavye','fare','yazılım','köfte','okul','kitap','bilgisayar','ekran','tuş','harf','kelime','proje','deney','uzay','yıldız','gezegen','pil','devre','kablo','kamera','ışık','ses','oyun','puan','bölüm','hedef','çözüm','dikkat','merak','arkadaş','öğretmen','sınıf','şehir','park','tren','araba'];
+      let timeLeft = 60, correct = 0, started = false, currentWord = words[0];
+      stage.innerHTML = `<div style="text-align:center; max-width:540px; width:100%; margin-top:20px;"><div style="display:flex; justify-content:space-around; margin-bottom:18px; font-weight:800; font-size:1.15rem;"><span>⏱️ Süre: <span id="tTime">60</span> sn</span><span>🏆 Doğru (DKS): <span id="tScore">0</span></span></div><div style="background:#fff; border:2px solid var(--accent-purple); border-radius:20px; padding:26px; margin-bottom:16px;"><div id="tWord" style="font-size:2.5rem; font-weight:800; color:var(--accent-dark);">${currentWord}</div></div><input id="tInput" type="text" placeholder="Buraya yazmaya başla..." autocomplete="off" style="width:100%; padding:15px 20px; font-size:1.25rem; border-radius:16px; border:2px solid var(--border-soft); text-align:center; font-family:inherit; font-weight:700;" /></div>`;
+      const input = document.getElementById('tInput'); input.focus();
+      input.oninput = () => {
+        if (!started) {
+          started = true;
+          activeIntervals.push(setInterval(() => {
+            timeLeft--; document.getElementById('tTime').innerText = timeLeft;
+            if (timeLeft <= 0) { clearGameTimers(); input.disabled = true; playWinSound(); { const st = correct >= 25 ? 3 : correct >= 15 ? 2 : correct >= 8 ? 1 : 0; Store.best('typing', correct); Store.stars('typing', 1, st); renderUserBar(); document.getElementById('tWord').innerHTML = `🎉 Hızın: ${correct} DKS! ${'⭐'.repeat(st)}<br><button class="btn-primary" style="margin-top:10px;" onclick="openGame('typing')">🔄 Tekrar Dene</button>`; } }
+          }, 1000));
+        }
+        if (input.value.trim().toLocaleLowerCase('tr-TR') === currentWord) {
+          correct++; playTone(720, 'triangle', 0.12); document.getElementById('tScore').innerText = correct;
+          input.value = ''; currentWord = words[Math.floor(Math.random()*words.length)]; document.getElementById('tWord').innerText = currentWord;
+        }
+      };
+    }
+
+    function initWaterSortGame(title, stage) {
+      title.innerHTML = '🧪 Su Sıralama — Mantık ve Planlama';
+      let tubes = [['#ef4444','#3b82f6','#ef4444','#3b82f6'], ['#3b82f6','#ef4444','#10b981','#10b981'], ['#10b981','#10b981','#3b82f6','#ef4444'], []], selected = null;
+      const initialTubes = JSON.stringify(tubes); let history = [], moves = 0, animating = false;
+      function pourAnimate(fromIdx, toIdx, color, toLen, done) {
+        animating = true;
+        const wrap = document.getElementById('tubesWrap'), A = wrap.children[fromIdx], B = wrap.children[toIdx];
+        const wr = wrap.getBoundingClientRect(), ar = A.getBoundingClientRect(), br = B.getBoundingClientRect();
+        const lift = A.classList.contains('selected') ? 14 : 0;
+        const dir = br.left > ar.left ? 1 : -1, th = 65 * Math.PI / 180, h = ar.height / 2;
+        const mx = br.left + br.width / 2, my = br.top - 6;
+        const dx = (mx - dir * h * Math.sin(th)) - (ar.left + ar.width / 2);
+        const dy = (my + h * Math.cos(th)) - (ar.top + ar.height / 2 + lift);
+        A.classList.remove('selected'); A.classList.add('pouring');
+        A.style.transform = `translate(${dx}px, ${dy}px) rotate(${dir * 65}deg)`;
+        playTone(520, 'sine', 0.1);
+        addSafeTimeout(() => {
+          const surface = br.bottom - toLen * 0.25 * br.height;
+          const stream = document.createElement('div'); stream.className = 'pour-stream'; stream.style.background = color;
+          stream.style.left = (mx - wr.left - 3) + 'px'; stream.style.top = (my - wr.top) + 'px'; stream.style.height = Math.max(8, surface - my) + 'px';
+          wrap.appendChild(stream);
+          if (A.lastElementChild) A.lastElementChild.classList.add('pour-out');
+          const layer = document.createElement('div'); layer.className = 'water-layer pour-in'; layer.style.background = color; B.appendChild(layer);
+          [0, 1, 2].forEach(k => addSafeTimeout(() => playTone(420 + k * 70, 'sine', 0.07), k * 150));
+          addSafeTimeout(() => { stream.remove(); A.style.transform = ''; A.classList.remove('pouring'); }, 600);
+          addSafeTimeout(() => { animating = false; done(); }, 900);
+        }, 340);
+      }
+      function renderTubes() {
+        stage.innerHTML = `<p style="font-weight:700; margin-bottom:10px;">🧪 Her tüpte tek renk kalana kadar sıvıları aktar! Hamle: ${moves}</p><div style="display:flex; gap:8px; margin-bottom:10px;"><button class="btn-outline" id="wsUndo">↩️ Geri Al</button><button class="btn-outline" id="wsReset">🔄 Baştan Başla</button></div><div class="tubes-wrap" id="tubesWrap"></div><div id="waterMsg" style="font-weight:800; color:var(--accent-purple); margin-top:10px;"></div>`;
+        const wrap = document.getElementById('tubesWrap');
+        document.getElementById('wsUndo').onclick = () => { if (animating) return; const prev = history.pop(); if (prev) { tubes = JSON.parse(prev); moves = Math.max(0, moves - 1); selected = null; renderTubes(); } };
+        document.getElementById('wsReset').onclick = () => { if (animating) return; tubes = JSON.parse(initialTubes); history = []; moves = 0; selected = null; renderTubes(); };
+        tubes.forEach((t, idx) => {
+          const el = document.createElement('div'); el.className = 'tube' + (selected === idx ? ' selected' : '');
+          t.forEach(c => { const l = document.createElement('div'); l.className = 'water-layer'; l.style.background = c; el.appendChild(l); });
+          el.onclick = () => {
+            if (animating) return;
+            if (selected === null) { if (t.length) { selected = idx; playTone(480, 'sine', 0.08); renderTubes(); } }
+            else if (selected === idx) { selected = null; renderTubes(); }
+            else {
+              const from = tubes[selected], to = tubes[idx], topC = from[from.length - 1];
+              if (to.length < 4 && (to.length === 0 || to[to.length - 1] === topC)) {
+                pourAnimate(selected, idx, topC, to.length, () => {
+                history.push(JSON.stringify(tubes)); to.push(from.pop()); moves++; selected = null; renderTubes();
+                if (tubes.every(tb => tb.length === 0 || (tb.length === 4 && tb.every(c => c === tb[0])))) { playWinSound(); { const st = moves <= 14 ? 3 : moves <= 20 ? 2 : 1; Store.stars('watersort', 1, st); Store.best('watersort', Math.max(0, 40 - moves)); renderUserBar(); document.getElementById('waterMsg').innerText = `🎉 Tebrikler! ${moves} hamlede sıralandı! ${'⭐'.repeat(st)}`; } }
+                });
+              } else { playTone(220, 'sawtooth', 0.12); selected = null; renderTubes(); }
+            }
+          };
+          wrap.appendChild(el);
+        });
+      }
+      renderTubes();
+    }
+
+    function initXoxGame(title, stage) {
+      title.innerHTML = '❌⭕ XOX — Bilim Ovası Yapay Zekasına Karşı';
+      let board = Array(9).fill(''), gameOver = false, mode = 'orta';
+      function minimax(b, player) {
+        const r = checkWin(b);
+        if (r === '⭕') return { s: 1 }; if (r === '❌') return { s: -1 }; if (r === 'BERABERE') return { s: 0 };
+        let best = null;
+        b.forEach((v, i) => { if (v !== '') return; b[i] = player; const sc = minimax(b, player === '⭕' ? '❌' : '⭕').s; b[i] = '';
+          if (best === null || (player === '⭕' ? sc > best.s : sc < best.s)) best = { s: sc, i }; });
+        return best;
+      }
+      function aiMove(b) {
+        const empty = b.map((v, i) => v === '' ? i : null).filter(v => v !== null);
+        const smart = mode === 'zor' || (mode === 'orta' && Math.random() < 0.6);
+        return smart ? minimax(b.slice(), '⭕').i : empty[Math.floor(Math.random() * empty.length)];
+      }
+      function award(res) {
+        const st = res === '❌' ? { kolay: 1, orta: 2, zor: 3 }[mode] : (res === 'BERABERE' ? { kolay: 0, orta: 1, zor: 3 }[mode] : 0);
+        Store.stars('xox', 1, st); renderUserBar();
+      }
+      function checkWin(b) {
+        for (let [a,c,d] of [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]) if (b[a] && b[a]===b[c] && b[a]===b[d]) return b[a];
+        return b.includes('') ? null : 'BERABERE';
+      }
+      function renderXox(status = 'Senin Sıran (❌)') {
+        stage.innerHTML = `<div style="font-weight:800; font-size:1.15rem; margin-bottom:14px;">${status}</div><div style="display:grid; grid-template-columns:repeat(3, 94px); grid-template-rows:repeat(3, 94px); gap:10px; margin-bottom:16px;">${board.map((v, i) => `<div class="xox-cell" data-idx="${i}" style="background:#fff; border:2px solid var(--border-soft); border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:2.3rem; cursor:pointer;">${v}</div>`).join('')}</div><button class="btn-outline" id="resetXox">🔄 Yeni Oyun</button><div style="margin-top:12px; display:flex; gap:6px; justify-content:center;">${['kolay','orta','zor'].map(m => `<button class="filter-btn ${m === mode ? 'active' : ''}" data-mode="${m}">${m.toUpperCase()}</button>`).join('')}</div>`;
+        document.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { mode = b.dataset.mode; board = Array(9).fill(''); gameOver = false; renderXox(); });
+        document.getElementById('resetXox').onclick = () => { board = Array(9).fill(''); gameOver = false; renderXox(); };
+        document.querySelectorAll('.xox-cell').forEach(cell => {
+          cell.onclick = () => {
+            const idx = Number(cell.dataset.idx); if (gameOver || board[idx] !== '') return;
+            board[idx] = '❌'; playTone(600, 'triangle', 0.12);
+            let res = checkWin(board);
+            if (res) { gameOver = true; if (res === '❌') playWinSound(); award(res); renderXox(res === 'BERABERE' ? '🤝 Berabere!' : `🏆 Kazanan: ${res}`); return; }
+            const empty = board.map((v, i) => v === '' ? i : null).filter(v => v !== null);
+            board[aiMove(board)] = '⭕';
+            res = checkWin(board);
+            if (res) { gameOver = true; award(res); renderXox(res === 'BERABERE' ? '🤝 Berabere!' : `Kazanan: ${res}`); } else renderXox('Senin Sıran (❌)');
+          };
+        });
+      }
+      renderXox();
+    }
+
+    // =========================================================================
+    // PROFIL ARAYÜZÜ: giriş, kullanıcı çubuğu, karne, erişilebilirlik
+    // =========================================================================
+    const esc = t => String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const REPORT_DEF = [
+      { g: 'salihli', t: '🚗 Salihli Kod-Sürüş', n: 8 }, { g: 'coderobot', t: '🤖 Robotu Kodla', n: 5 },
+      { g: 'kofte', t: '🍢 Odun Köftecisi', n: 1, b: ' ₺' }, { g: 'typing', t: '⌨️ Klavye Hız Testi', n: 1, b: ' DKS' },
+      { g: 'letterrain', t: '🌧️ Harf Yağmuru', n: 1, b: ' puan' }, { g: 'watersort', t: '🧪 Su Sıralama', n: 1 },
+      { g: 'xox', t: '❌⭕ XOX', n: 1 }
+    ];
+    function gameStars(g, n) { let t = 0; for (let i = 1; i <= n; i++) t += Store.getStars(g, i); return t; }
+
+    function renderUserBar() {
+      const u = Store.current(), bar = document.getElementById('userBar');
+      if (!u) { bar.innerHTML = ''; return; }
+      bar.innerHTML = `<span class="user-chip">👤 ${esc(u.name)} (${esc(u.cls)}) · ⭐ ${Store.total()}</span>
+        <button class="btn-outline" onclick="showReport()">📒 Karnem</button>
+        <button class="btn-outline" onclick="toggleMute()" aria-label="Sesi aç/kapat">${Store.isMuted() ? '🔇' : '🔊'}</button>
+        <button class="btn-outline" onclick="doLogout()">🚪 Çıkış</button>`;
+    }
+    function toggleMute() { Store.toggleMute(); renderUserBar(); }
+    function doLogout() { closeModal(); closeReport(); Store.logout(); renderUserBar(); showLogin(); }
+
+    function showLogin() {
+      const ov = document.getElementById('loginOverlay'), list = document.getElementById('loginList');
+      const users = Store.users();
+      document.getElementById('loginListWrap').style.display = users.length ? 'block' : 'none';
+      list.innerHTML = '';
+      users.forEach(u => {
+        const b = document.createElement('button'); b.className = 'filter-btn'; b.textContent = `${u.cls} · ${u.name}`;
+        b.onclick = () => { Store.loginKey(u.key); ov.classList.remove('active'); renderUserBar(); };
+        list.appendChild(b);
+      });
+      document.getElementById('loginErr').textContent = '';
+      ov.classList.add('active');
+      setTimeout(() => document.getElementById('loginCls').focus(), 30);
+    }
+    function submitLogin() {
+      const cls = document.getElementById('loginCls').value, name = document.getElementById('loginName').value;
+      if (!Store.login(name, cls)) { document.getElementById('loginErr').textContent = 'Lütfen sınıfını ve adını yaz.'; return; }
+      document.getElementById('loginName').value = ''; document.getElementById('loginCls').value = '';
+      document.getElementById('loginOverlay').classList.remove('active'); renderUserBar();
+    }
+    document.getElementById('loginBtn').onclick = submitLogin;
+    ['loginCls', 'loginName'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') submitLogin(); }));
+
+    function reportText() {
+      const u = Store.current(); if (!u) return '';
+      const lines = [`Bilim Ovası Robotik — Karne`, `Sınıf: ${u.cls}  Ad: ${u.name}`, `Toplam yıldız: ${Store.total()}`, ''];
+      REPORT_DEF.forEach(r => { const best = r.b ? `  En iyi: ${Store.getBest(r.g)}${r.b}` : ''; lines.push(`${r.t}: ${gameStars(r.g, r.n)}/${r.n * 3} yıldız${best}`); });
+      return lines.join('\n');
+    }
+    function showReport() {
+      const u = Store.current(); if (!u) return;
+      const rows = REPORT_DEF.map(r => `<tr><td>${r.t}</td><td>${'⭐'.repeat(Math.min(gameStars(r.g, r.n), 9)) || '—'} <small>${gameStars(r.g, r.n)}/${r.n * 3}</small></td><td>${r.b ? Store.getBest(r.g) + r.b : ''}</td></tr>`).join('');
+      document.getElementById('reportBody').innerHTML = `<p><strong>${esc(u.name)}</strong> (${esc(u.cls)}) — toplam ⭐ <strong>${Store.total()}</strong></p>
+        <table class="report-table"><tr><th>Oyun</th><th>Yıldız</th><th>En iyi</th></tr>${rows}</table>
+        <textarea class="report-text" id="reportText" readonly></textarea>
+        <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;"><button class="btn-primary" onclick="copyReport()">📋 Karnemi Kopyala</button><button class="btn-outline" onclick="downloadReport()">⬇️ Dosya Olarak İndir</button></div>
+        <div id="reportMsg" style="font-weight:700; color:#15803d; min-height:20px; margin-top:6px;"></div>`;
+      document.getElementById('reportText').value = reportText();
+      document.getElementById('reportOverlay').classList.add('active');
+    }
+    function closeReport() { document.getElementById('reportOverlay').classList.remove('active'); }
+    function copyReport() {
+      const ta = document.getElementById('reportText'), msg = document.getElementById('reportMsg');
+      const done = () => { msg.textContent = '✅ Kopyalandı! Öğretmenine gönderebilirsin.'; };
+      try { navigator.clipboard.writeText(ta.value).then(done, () => { ta.select(); document.execCommand('copy'); done(); }); }
+      catch (e) { ta.select(); try { document.execCommand('copy'); done(); } catch (e2) { msg.textContent = 'Metni seçip kopyalayabilirsin.'; } }
+    }
+    function downloadReport() {
+      const u = Store.current(); if (!u) return;
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([reportText()], { type: 'text/plain;charset=utf-8' }));
+      a.download = `karne-${u.cls}-${u.name}`.replace(/[^\p{L}\p{N}-]+/gu, '_') + '.txt';
+      document.body.appendChild(a); a.click(); a.remove();
+    }
+
+    // Erişilebilirlik: tıklanabilir div/span'lar klavyeyle de kullanılabilsin
+    function enhance(root) {
+      root.querySelectorAll('div,span').forEach(el => {
+        if ((el.onclick || el.getAttribute('onclick')) && !el.hasAttribute('tabindex')) { el.tabIndex = 0; el.setAttribute('role', 'button'); }
+      });
+    }
+    enhance(document.body);
+    new MutationObserver(() => enhance(document.getElementById('modalStage'))).observe(document.getElementById('modalStage'), { childList: true, subtree: true });
+    document.addEventListener('keydown', e => {
+      const t = e.target;
+      if ((e.key === 'Enter' || e.key === ' ') && t && t.getAttribute && t.getAttribute('role') === 'button') { e.preventDefault(); t.click(); }
+      if (e.key === 'Escape') { closeReport(); }
+    });
+
+    renderUserBar();
+    if (!Store.current()) showLogin();
+  </script>
+</body>
+</html>
